@@ -1,0 +1,6 @@
+@HaNoiTravel_HostAddress = http://localhost:5100
+
+GET {{HaNoiTravel_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
