@@ -59,7 +59,7 @@ namespace HaNoiTravel.Controllers
                 var accessTokenCookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
-                    Expires = DateTimeOffset.UtcNow.AddMinutes(accessTokenExpiresInMinutes), // Thời gian hết hạn Access Token
+                    Expires = DateTimeOffset.Now.AddMinutes(accessTokenExpiresInMinutes), // Thời gian hết hạn Access Token
                     Secure = _configuration.GetValue<bool>("Cookie:Secure", true),
                     SameSite = SameSiteMode.Strict, // Nên dùng Strict hoặc Lax
                     IsEssential = true,
@@ -71,7 +71,7 @@ namespace HaNoiTravel.Controllers
                 var refreshTokenCookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
-                    Expires = DateTimeOffset.UtcNow.AddDays(refreshTokenExpiresInDays), // Thời gian hết hạn Refresh Token
+                    Expires = DateTimeOffset.Now.AddDays(refreshTokenExpiresInDays), // Thời gian hết hạn Refresh Token
                     Secure = _configuration.GetValue<bool>("Cookie:Secure", true),
                     SameSite = SameSiteMode.Strict, // Có thể dùng Lax hoặc Strict tùy yêu cầu bảo mật
                     IsEssential = true,
@@ -157,7 +157,7 @@ namespace HaNoiTravel.Controllers
             var accessTokenCookieOptions = new CookieOptions
             {
                 HttpOnly = true,
-                Expires = DateTimeOffset.UtcNow.AddMinutes(_configuration.GetValue<int>("Jwt:AccessTokenExpiresInMinutes", 15)), // Thời gian hết hạn Access Token
+                Expires = DateTimeOffset.Now.AddMinutes(_configuration.GetValue<int>("Jwt:AccessTokenExpiresInMinutes", 15)), // Thời gian hết hạn Access Token
                 Secure = _configuration.GetValue<bool>("Cookie:Secure", true),
                 SameSite = SameSiteMode.Strict,
                 IsEssential = true,

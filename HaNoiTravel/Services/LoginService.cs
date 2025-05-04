@@ -38,8 +38,8 @@ namespace HaNoiTravel.Services
                 var refreshToken = new RefreshToken
                 {
                     Token = Convert.ToBase64String(randomBytes),
-                    ExpiresAt = DateTime.UtcNow.AddDays(refreshTokenExpiresInDays), // Thời gian hết hạn Refresh Token
-                    CreatedAt = DateTime.UtcNow,
+                    ExpiresAt = DateTime.Now.AddDays(refreshTokenExpiresInDays), // Thời gian hết hạn Refresh Token
+                    CreatedAt = DateTime.Now,
                     CreatedByIp = ipAddress,
                     UserId = user.Userid
                 };
@@ -148,7 +148,7 @@ namespace HaNoiTravel.Services
             }
 
             // Token hợp lệ - Thu hồi token hiện tại và sinh token mới
-            existingRefreshToken.RevokedAt = DateTime.UtcNow;
+            existingRefreshToken.RevokedAt = DateTime.Now;
             existingRefreshToken.RevokedByIp = ipAddress;
             existingRefreshToken.ReplacedByToken = GenerateRandomTokenString(); // Sinh token ngẫu nhiên để thay thế (đánh dấu token cũ đã bị thay thế)
 
@@ -179,7 +179,7 @@ namespace HaNoiTravel.Services
             }
 
             // Thu hồi token
-            existingRefreshToken.RevokedAt = DateTime.UtcNow;
+            existingRefreshToken.RevokedAt = DateTime.Now;
             existingRefreshToken.RevokedByIp = ipAddress;
             existingRefreshToken.ReplacedByToken = reason ?? "Logged out"; // Ghi lý do thu hồi
 
@@ -191,12 +191,12 @@ namespace HaNoiTravel.Services
         private async Task RevokeAllRefreshTokensForUserAsync(User user, string ipAddress, string reason = null)
         {
             var activeRefreshTokens = await _context.RefreshTokens
-                .Where(rt => rt.UserId == user.Userid && rt.RevokedAt == null && DateTime.UtcNow < rt.ExpiresAt)
+                .Where(rt => rt.UserId == user.Userid && rt.RevokedAt == null && DateTime.Now < rt.ExpiresAt)
                 .ToListAsync();
 
             foreach (var token in activeRefreshTokens)
             {
-                token.RevokedAt = DateTime.UtcNow;
+                token.RevokedAt = DateTime.Now;
                 token.RevokedByIp = ipAddress;
                 token.ReplacedByToken = reason ?? "Revoked all tokens";
             }

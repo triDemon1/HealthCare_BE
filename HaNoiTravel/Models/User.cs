@@ -29,5 +29,5 @@ public partial class User
 
     public virtual Role Role { get; set; } = null!;
 
-    public virtual ICollection<Staff> Staff { get; set; } = new List<Staff>();
+    public virtual Staff? Staff { get; set; }
 }

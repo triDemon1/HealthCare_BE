@@ -8,26 +8,16 @@ namespace HaNoiTravel
     {
         public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
         {
-            // 'this IServiceCollection services' cho phép gọi phương thức này trên đối tượng IServiceCollection
-            // 'configuration' được truyền vào để có thể truy cập cấu hình nếu dịch vụ cần
-
-            // Đăng ký AuthService với IAuthService
             services.AddScoped<ILoginService, LoginService>();
             services.AddScoped<IRegisterService, RegisterService>();
             services.AddScoped<IBookingService, BookingService>();
-
-            // Đăng ký AppDbContext (giữ nguyên hoặc chuyển từ Program.cs sang đây)
-            // Nếu bạn muốn giữ đăng ký DbContext ở đây:
-            // services.AddDbContext<AppDbContext>(options =>
-            //     options.UseSqlServer(configuration.GetConnectionString("YourConnectionString")));
-            // Lưu ý: Nếu chuyển DbContext sang đây, hãy xóa nó khỏi Program.cs
-
-            // Đăng ký các dịch vụ khác của ứng dụng ở đây
-            // services.AddScoped<IOtherService, OtherService>();
-            // services.AddTransient<ITransientService, TransientService>();
-            // services.AddSingleton<ISingletonService, SingletonService>();
-
-            // Trả về IServiceCollection để cho phép chaining (gọi nhiều phương thức .Add... liên tiếp)
+            services.AddScoped<IUserManagementService, UserManagementService>();
+            services.AddScoped<ILookupDataService, LookupDataService>();
+            services.AddScoped<IBookingManagementService, BookingManagementService>();
+            services.AddScoped<IOrderManagementService, OrderManagementService>();
+            services.AddScoped<IProductService, ProductService>();
+            services.AddScoped<IOrderService, OrderService>();
+            services.AddScoped<ICustomerService, CustomerService>();
             return services;
         }
     }

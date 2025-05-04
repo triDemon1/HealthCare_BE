@@ -63,12 +63,12 @@ namespace HaNoiTravel.Services
             // --- Logic to handle SubjectId or NewSubjectData ---
             int subjectIdToUse;
 
-            if (payload.SubjectId.HasValue && payload.SubjectId > 0)
+            if (payload.subjectId.HasValue && payload.subjectId > 0)
             {
                 // Case 1: Existing SubjectId is provided
                 // Optional: Validate if the SubjectId exists and belongs to the customer
                 var existingSubject = await _context.Subjects
-                                                    .FirstOrDefaultAsync(s => s.Subjectid == payload.SubjectId.Value && s.Customerid == payload.CustomerId);
+                                                    .FirstOrDefaultAsync(s => s.Subjectid == payload.subjectId.Value && s.Customerid == payload.customerId);
                 if (existingSubject == null)
                 {
                     // Handle error: Invalid SubjectId provided
@@ -80,7 +80,7 @@ namespace HaNoiTravel.Services
             {
                 // Case 2: New Subject data is provided
                 // Optional: Add validation for NewSubjectData
-                if (payload.NewSubjectData.TypeId <= 0)
+                if (payload.NewSubjectData.typeId <= 0)
                 {
                     // Handle error: TypeId is required for a new subject
                     return false; // Or throw an exception
@@ -88,13 +88,13 @@ namespace HaNoiTravel.Services
 
                 var newSubject = new Subject
                 {
-                    Customerid = payload.CustomerId,
-                    Typeid = payload.NewSubjectData.TypeId,
-                    Name = payload.NewSubjectData.Name,
-                    Dateofbirth = payload.NewSubjectData.DateOfBirth,
-                    Gender = payload.NewSubjectData.Gender,
-                    Medicalnotes = payload.NewSubjectData.MedicalNotes,
-                    Imageurl = payload.NewSubjectData.ImageUrl,
+                    Customerid = payload.customerId,
+                    Typeid = payload.NewSubjectData.typeId,
+                    Name = payload.NewSubjectData.name,
+                    Dateofbirth = payload.NewSubjectData.dateOfBirth,
+                    Gender = payload.NewSubjectData.gender,
+                    Medicalnotes = payload.NewSubjectData.medicalNotes,
+                    Imageurl = payload.NewSubjectData.imageUrl,
                     Createdat = System.DateTime.UtcNow // Set creation time
                 };
 
@@ -125,17 +125,17 @@ namespace HaNoiTravel.Services
             // Map payload to Booking entity using the determined subjectIdToUse
             var booking = new Booking
             {
-                Addressid = payload.AddressId,
+                Addressid = payload.addressId,
                 Subjectid = subjectIdToUse, // Assign the non-nullable subjectIdToUse
                 // Handle StaffId if applicable (can be null)
-                Staffid = payload.StaffId > 0 ? payload.StaffId : null,
+                Staffid = payload.staffId > 0 ? payload.staffId : null,
                 Statusid = pendingStatus.Statusid, // Assign the found status ID
-                Customerid = payload.CustomerId,
-                Serviceid = payload.ServiceId,
-                Priceatbooking = payload.PriceAtBooking, // Assuming price is sent or calculated here
-                Scheduledstarttime = payload.ScheduledStartTime,
-                Scheduledendtime = payload.ScheduledEndTime,
-                Notes = payload.Notes,
+                Customerid = payload.customerId,
+                Serviceid = payload.serviceId,
+                Priceatbooking = payload.priceAtBooking, // Assuming price is sent or calculated here
+                Scheduledstarttime = payload.scheduledStartTime,
+                Scheduledendtime = payload.scheduledEndTime,
+                Notes = payload.notes,
                 Createdat = System.DateTime.UtcNow // Set creation time
             };
 
@@ -145,6 +145,37 @@ namespace HaNoiTravel.Services
 
             return result > 0; // Return true if at least one entity was saved (the booking)
                                // Note: SaveChangesAsync() was already called for new Subject if applicable.
+        }
+        public async Task<IEnumerable<BookingResponse>> GetCustomerBookingsAsync(int customerId)
+        {
+            // You might want to add validation here to ensure the customerId is valid
+            // and potentially that the requesting user has permission to view these bookings.
+
+            var bookings = await _context.Bookings
+                .Where(b => b.Customerid == customerId)
+                .Include(b => b.Service) // Include related Service data
+                .Include(b => b.Subject) // Include related Subject data
+                .Include(b => b.Status) // Include related BookingStatus data
+                .OrderByDescending(b => b.Scheduledstarttime) // Order by date, newest first
+                .Select(b => new BookingResponse // Map to a DTO for cleaner response
+                {
+                    BookingId = b.Bookingid,
+                    ServiceId = b.Serviceid,
+                    ServiceName = b.Service.Name, // Get name from included Service
+                    SubjectId = b.Subjectid,
+                    SubjectName = b.Subject.Name, // Get name from included Subject
+                    StatusId = b.Statusid,
+                    StatusName = b.Status.Statusname, // Get name from included BookingStatus
+                    ScheduledStartTime = b.Scheduledstarttime,
+                    ScheduledEndTime = b.Scheduledendtime,
+                    PriceAtBooking = b.Priceatbooking,
+                    Notes = b.Notes,
+                    CreatedAt = b.Createdat
+                    // Add other fields you want to expose to the frontend
+                })
+                .ToListAsync();
+
+            return bookings;
         }
     }
 }

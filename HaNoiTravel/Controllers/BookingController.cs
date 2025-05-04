@@ -4,6 +4,8 @@ using HaNoiTravel.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace HaNoiTravel.Controllers
 {
@@ -13,6 +15,7 @@ namespace HaNoiTravel.Controllers
     public class BookingController : ControllerBase
     {
         private readonly IBookingService _bookingService;
+
 
         public BookingController(IBookingService healthCareService)
         {
@@ -105,6 +108,21 @@ namespace HaNoiTravel.Controllers
                 // Return 400 Bad Request or 500 Internal Server Error depending on the failure reason
                 return BadRequest(new { message = "Failed to create booking." });
             }
+        }
+        // --- NEW: Get bookings for a specific customer endpoint ---
+        // GET /api/customers/{customerId}/bookings
+        [HttpGet("customers/{customerId}/bookings")]
+        public async Task<ActionResult<IEnumerable<BookingResponse>>> GetCustomerBookings(int customerId)
+        {
+            var bookings = await _bookingService.GetCustomerBookingsAsync(customerId);
+
+            if (bookings == null || !bookings.Any())
+            {
+                // Return 200 OK with an empty list if no bookings are found for this customer.
+                return Ok(new List<BookingResponse>());
+            }
+
+            return Ok(bookings);
         }
     }
 }

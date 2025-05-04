@@ -97,8 +97,7 @@ public partial class AppDbContext : DbContext
 
             entity.HasOne(d => d.Customer).WithMany(p => p.Addresses)
                 .HasForeignKey(d => d.Customerid)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__ADDRESSES__CUSTO__160F4887");
+                .HasConstraintName("FK_Addresses_Customers");
         });
 
         modelBuilder.Entity<Booking>(entity =>
@@ -515,6 +514,8 @@ public partial class AppDbContext : DbContext
 
             entity.ToTable("STAFF");
 
+            entity.HasIndex(e => e.Userid, "UQ_STAFF_USERID").IsUnique();
+
             entity.HasIndex(e => e.Phonenumber, "UQ__STAFF__8F2B07B14093EEDA").IsUnique();
 
             entity.Property(e => e.Staffid).HasColumnName("STAFFID");
@@ -542,8 +543,8 @@ public partial class AppDbContext : DbContext
                 .HasColumnName("UPDATEDAT");
             entity.Property(e => e.Userid).HasColumnName("USERID");
 
-            entity.HasOne(d => d.User).WithMany(p => p.Staff)
-                .HasForeignKey(d => d.Userid)
+            entity.HasOne(d => d.User).WithOne(p => p.Staff)
+                .HasForeignKey<Staff>(d => d.Userid)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__STAFF__USERID__14270015");
         });

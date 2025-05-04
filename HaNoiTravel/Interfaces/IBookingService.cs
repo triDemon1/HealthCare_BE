@@ -10,5 +10,6 @@ namespace HaNoiTravel.Interfaces
         Task<IEnumerable<Address>> GetCustomerAddressesAsync(int customerId);
         Task<IEnumerable<Subject>> GetExistingSubjectsAsync(int customerId, int typeId);
         Task<bool> CreateBookingAsync(BookingPayload payload); // Return bool or a Booking object
+        Task<IEnumerable<BookingResponse>> GetCustomerBookingsAsync(int customerId);
     }
 }
