@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using HaNoiTravel.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace HaNoiTravel.Data;
 
@@ -120,6 +121,7 @@ public partial class AppDbContext : DbContext
                 .HasColumnName("CREATEDAT");
             entity.Property(e => e.Customerid).HasColumnName("CUSTOMERID");
             entity.Property(e => e.Notes).HasColumnName("NOTES");
+            entity.Property(e => e.PaymentStatusId).HasColumnName("PaymentStatusID");
             entity.Property(e => e.Priceatbooking)
                 .HasColumnType("decimal(15, 2)")
                 .HasColumnName("PRICEATBOOKING");
@@ -147,6 +149,10 @@ public partial class AppDbContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__BOOKINGS__CUSTOM__18EBB532");
 
+            entity.HasOne(d => d.PaymentStatus).WithMany(p => p.Bookings)
+                .HasForeignKey(d => d.PaymentStatusId)
+                .HasConstraintName("FK__BOOKINGS__Paymen__0697FACD");
+
             entity.HasOne(d => d.Service).WithMany(p => p.Bookings)
                 .HasForeignKey(d => d.Serviceid)
                 .OnDelete(DeleteBehavior.ClientSetNull)
@@ -165,6 +171,7 @@ public partial class AppDbContext : DbContext
                 .HasForeignKey(d => d.Subjectid)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__BOOKINGS__SUBJEC__1EA48E88");
+            entity.ToTable("BOOKINGS", table => table.UseSqlOutputClause(false));
         });
 
         modelBuilder.Entity<Bookingstatus>(entity =>
@@ -713,6 +720,7 @@ public partial class AppDbContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__USER__ROLEID__1F98B2C1");
         });
+
 
         OnModelCreatingPartial(modelBuilder);
     }

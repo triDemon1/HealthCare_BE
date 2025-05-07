@@ -6,6 +6,7 @@
         public int ServiceId { get; set; }
         public string ServiceName { get; set; } // Tên dịch vụ
         public string CustomerName { get; set; }
+        public string paymentStatusName { get; set; }
         public int SubjectId { get; set; }
         public string? SubjectName { get; set; } // Tên đối tượng
         public int StatusId { get; set; }
@@ -15,5 +16,6 @@
         public decimal PriceAtBooking { get; set; }
         public string? Notes { get; set; }
         public DateTime? CreatedAt { get; set; }
+        public int? PaymentStatusId { get; set; }
     }
 }

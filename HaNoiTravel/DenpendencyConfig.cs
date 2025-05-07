@@ -18,6 +18,8 @@ namespace HaNoiTravel
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<ICustomerService, CustomerService>();
+            services.AddScoped<IPaymentService, PaymentService>();
+            services.AddScoped<IMomoService, MomoService>();
             return services;
         }
     }

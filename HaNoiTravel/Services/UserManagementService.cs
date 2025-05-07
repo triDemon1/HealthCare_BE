@@ -19,53 +19,7 @@ namespace HaNoiTravel.Services
             _context = context;
         }
 
-        // User Management
-        //public async Task<IEnumerable<usersAdminDto>> GetAllUsersAsync()
-        //{
-        //    var users = await _context.Users
-        //        .Include(u => u.Role)
-        //        .Include(u => u.Customer) // Include Customer data
-        //        .Include(u => u.Staff) // Include Staff data
-        //        .Select(u => new usersAdminDto
-        //        {
-        //            UserId = u.Userid,
-        //            Username = u.Username,
-        //            Email = u.Email,
-        //            PhoneNumber = u.Phonenumber,
-        //            CreatedAt = u.Createdat,
-        //            UpdatedAt = u.Updatedat,
-        //            IsActive = u.Isactive,
-        //            RoleId = u.Roleid,
-        //            RoleName = u.Role.Rolename,
-        //            // Map nested Customer DTO if Customer exists
-        //            Customer = u.Customer != null ? new CustomerAdminDetailDto
-        //            {
-        //                CustomerId = u.Customer.Customerid,
-        //                FirstName = u.Customer.Firstname,
-        //                LastName = u.Customer.Lastname,
-        //                DateOfBirth = u.Customer.Dateofbirth,
-        //                Gender = u.Customer.Gender,
-        //                CreatedAt = u.Customer.Createdat,
-        //                UpdatedAt = u.Customer.Updatedat
-        //            } : null,
-        //            // Map nested Staff DTO if Staff exists
-        //            Staff = u.Staff != null ? new StaffAdminDetailDto
-        //            {
-        //                StaffId = u.Staff.Staffid,
-        //                FirstName = u.Staff.Firstname,
-        //                LastName = u.Staff.Lastname,
-        //                PhoneNumber = u.Staff.Phonenumber,
-        //                Skills = u.Staff.Skills,
-        //                ExpYear = u.Staff.Expyear,
-        //                IsAvailable = u.Staff.Isavailable,
-        //                CreateAt = u.Staff.Createat, // Note: Property name is CreateAt
-        //                UpdatedAt = u.Staff.Updatedat
-        //            } : null
-        //        })
-        //        .ToListAsync();
-
-        //    return users;
-        //}
+        
         public async Task<Pagination<usersAdminDto>> GetPagedUsersAsync(int pageIndex, int pageSize, int? RoleId)
         {
             var query = _context.Users // Sử dụng DbSet cho Entity User (tên là USER trong DB schema)

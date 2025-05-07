@@ -25,7 +25,6 @@ public partial class RefreshToken
     public int UserId { get; set; }
 
     public virtual User User { get; set; } = null!;
-
     [NotMapped] // <--- Thuộc tính này không ánh xạ vào cột trong DB
     public bool IsActive => RevokedAt == null && !IsExpired;
 

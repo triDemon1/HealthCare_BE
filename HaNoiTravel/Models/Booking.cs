@@ -35,9 +35,13 @@ public partial class Booking
 
     public DateTime? Updatedat { get; set; }
 
+    public int? PaymentStatusId { get; set; }
+
     public virtual Address Address { get; set; } = null!;
 
     public virtual Customer Customer { get; set; } = null!;
+
+    public virtual Paymentstatus? PaymentStatus { get; set; }
 
     public virtual Service Service { get; set; } = null!;
 

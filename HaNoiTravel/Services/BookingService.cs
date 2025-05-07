@@ -30,7 +30,10 @@ namespace HaNoiTravel.Services
         {
             return await _context.Services.ToListAsync();
         }
-
+        public async Task<IEnumerable<Paymentstatus>> GetPaymentStatusesAsync()
+        {
+            return await _context.Paymentstatuses.ToListAsync();
+        }
         public async Task<IEnumerable<Service>> GetServicesBySubjectTypeAsync(int subjectTypeId)
         {
             return await _context.Services
@@ -146,17 +149,21 @@ namespace HaNoiTravel.Services
             return result > 0; // Return true if at least one entity was saved (the booking)
                                // Note: SaveChangesAsync() was already called for new Subject if applicable.
         }
-        public async Task<IEnumerable<BookingResponse>> GetCustomerBookingsAsync(int customerId)
+        public async Task<Pagination<BookingResponse>> GetCustomerBookingsAsync(int customerId, int pageIndex, int pageSize)
         {
-            // You might want to add validation here to ensure the customerId is valid
-            // and potentially that the requesting user has permission to view these bookings.
-
-            var bookings = await _context.Bookings
+            var query = _context.Bookings
                 .Where(b => b.Customerid == customerId)
                 .Include(b => b.Service) // Include related Service data
                 .Include(b => b.Subject) // Include related Subject data
                 .Include(b => b.Status) // Include related BookingStatus data
-                .OrderByDescending(b => b.Scheduledstarttime) // Order by date, newest first
+                .Include(b => b.PaymentStatus)
+                .OrderByDescending(b => b.Scheduledstarttime); // Order by date, newest first
+
+            var totalCount = await query.CountAsync();
+
+            var bookings = await query
+                .Skip(pageIndex * pageSize)
+                .Take(pageSize)
                 .Select(b => new BookingResponse // Map to a DTO for cleaner response
                 {
                     BookingId = b.Bookingid,
@@ -170,12 +177,61 @@ namespace HaNoiTravel.Services
                     ScheduledEndTime = b.Scheduledendtime,
                     PriceAtBooking = b.Priceatbooking,
                     Notes = b.Notes,
-                    CreatedAt = b.Createdat
+                    CreatedAt = b.Createdat,
+                    PaymentStatusId = b.PaymentStatus.Paymentstatusid,
+                    paymentStatusName = b.PaymentStatus != null ? b.PaymentStatus.Statusname : "Chưa thanh toán" // Hiển thị "Chưa thanh toán" nếu PaymentStatusId null
                     // Add other fields you want to expose to the frontend
                 })
                 .ToListAsync();
 
-            return bookings;
+            return new Pagination<BookingResponse>
+            {
+                Items = bookings,
+                TotalCount = totalCount,
+                PageIndex = pageIndex,
+                PageSize = pageSize
+            };
+        }
+        public async Task<BookingAdminDto?> GetBookingByIdAsync(int bookingId)
+        {
+            var booking = await _context.Bookings
+               .Include(b => b.Customer)
+               .Include(b => b.Service)
+               .Include(b => b.Subject)
+               .Include(b => b.Status)
+               .Include(b => b.Staff)
+               .Include(b => b.Address)
+               .Include(b => b.PaymentStatus)
+               .Where(b => b.Bookingid == bookingId)
+               .Select(b => new BookingAdminDto
+               {
+                   BookingId = b.Bookingid,
+                   ServiceName = b.Service.Name,
+                   ServiceId = b.Serviceid,
+                   SubjectId = b.Subjectid,
+                   SubjectName = b.Subject.Name,
+                   StatusId = b.Statusid,
+                   StatusName = b.Status.Statusname,
+                   ScheduledStartTime = b.Scheduledstarttime,
+                   ScheduledEndTime = b.Scheduledendtime,
+                   paymentStatusName = b.PaymentStatus.Statusname,
+                   PriceAtBooking = b.Priceatbooking,
+                   Notes = b.Notes,
+                   CreatedAt = b.Createdat,
+                   CustomerId = b.Customerid,
+                   CustomerName = $"{b.Customer.Firstname} {b.Customer.Lastname}".Trim(),
+                   StaffId = b.Staffid,
+                   StaffName = b.Staff != null ? $"{b.Staff.Firstname} {b.Staff.Lastname}".Trim() : null,
+                   AddressId = b.Addressid,
+                   AddressStreet = b.Address.Street,
+                   AddressWard = b.Address.Ward,
+                   AddressDistrict = b.Address.District,
+                   AddressCity = b.Address.City,
+                   AddressCountry = b.Address.Country
+               })
+               .FirstOrDefaultAsync();
+
+            return booking;
         }
     }
 }

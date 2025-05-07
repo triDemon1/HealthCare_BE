@@ -18,14 +18,6 @@ namespace HaNoiTravel.Controllers
             _userManagementService = userManagementService;
             _context = context;
         }
-        //// User Management
-        //[HttpGet("admin/users")]
-        //[Authorize(Roles = "Admin")] // Chỉ cho phép Admin truy cập
-        //public async Task<ActionResult<IEnumerable<usersAdminDto>>> GetAllUsers()
-        //{
-        //    var users = await _userManagementService.GetAllUsersAsync();
-        //    return Ok(users);
-        //}
         [HttpGet("admin/users")] // Segment route cho endpoint lấy danh sách users
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

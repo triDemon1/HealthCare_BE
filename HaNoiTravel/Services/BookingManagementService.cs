@@ -21,6 +21,7 @@ namespace HaNoiTravel.Services
                 .Include(b => b.Status)
                 .Include(b => b.Staff) // Include Staff
                 .Include(b => b.Address) // Include Address
+                .Include(b => b.PaymentStatus)
                 .OrderByDescending(b => b.Scheduledstarttime)
                 .Select(b => new BookingAdminDto
                 {
@@ -33,6 +34,7 @@ namespace HaNoiTravel.Services
                     StatusName = b.Status.Statusname,
                     ScheduledStartTime = b.Scheduledstarttime,
                     ScheduledEndTime = b.Scheduledstarttime,
+                    paymentStatusName = b.PaymentStatus.Statusname,
                     PriceAtBooking = b.Priceatbooking,
                     Notes = b.Notes,
                     CreatedAt = b.Createdat,
@@ -61,6 +63,7 @@ namespace HaNoiTravel.Services
                .Include(b => b.Status)
                .Include(b => b.Staff)
                .Include(b => b.Address)
+               .Include(b => b.PaymentStatus)
                .Where(b => b.Bookingid == bookingId)
                .Select(b => new BookingAdminDto 
                {
@@ -73,6 +76,8 @@ namespace HaNoiTravel.Services
                    StatusName = b.Status.Statusname,
                    ScheduledStartTime = b.Scheduledstarttime,
                    ScheduledEndTime = b.Scheduledendtime,
+                   PaymentStatusId = b.PaymentStatus.Paymentstatusid,
+                   paymentStatusName = b.PaymentStatus.Statusname,
                    PriceAtBooking = b.Priceatbooking,
                    Notes = b.Notes,
                    CreatedAt = b.Createdat,
@@ -116,7 +121,7 @@ namespace HaNoiTravel.Services
             {
                 booking.Notes = statusDto.Notes;
             }
-            booking.Updatedat = DateTime.UtcNow; // Assuming you have an UpdatedAt field in Booking model
+            booking.Updatedat = DateTime.Now; // Assuming you have an UpdatedAt field in Booking model
 
             await _context.SaveChangesAsync();
 
@@ -217,6 +222,7 @@ namespace HaNoiTravel.Services
             booking.Priceatbooking = bookingDto.PriceAtBooking;
             booking.Addressid = bookingDto.AddressId;
             booking.Statusid = bookingDto.StatusId;
+            booking.PaymentStatusId = bookingDto.PaymentStatusId;
             booking.Notes = bookingDto.Notes;
             booking.Updatedat = DateTime.Now; // Assuming you have an UpdatedAt field
 

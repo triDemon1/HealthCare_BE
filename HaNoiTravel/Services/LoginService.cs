@@ -55,8 +55,9 @@ namespace HaNoiTravel.Services
                                     .Include(u => u.Role)
                                     .Include(u => u.RefreshTokens)
                                     .Include(u => u.Customer)
+                                    .ThenInclude(c => c.Addresses)
                                     .FirstOrDefaultAsync(u => u.Username == loginRequest.Username); // Hoặc u.EMAIL == loginRequest.Email
-
+            var addressId = user.Customer?.Addresses?.FirstOrDefault()?.Addressid;
             if (user == null)
             {
                 return null; // User not found
@@ -85,7 +86,8 @@ namespace HaNoiTravel.Services
                 UserName = user.Username,
                 UserId = user.Userid,
                 RefreshToken = refreshToken.Token,
-                CustomerId = user.Customer?.Customerid
+                CustomerId = user.Customer?.Customerid,
+                AddressId  = addressId
             };
         }
 

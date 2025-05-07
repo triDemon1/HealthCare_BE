@@ -1,6 +1,7 @@
 ﻿using HaNoiTravel.DTOS;
 using HaNoiTravel.Interfaces;
 using HaNoiTravel.Models;
+using HaNoiTravel.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -27,6 +28,14 @@ namespace HaNoiTravel.Controllers
         public async Task<ActionResult<IEnumerable<Subjecttype>>> GetSubjectTypes()
         {
             var subjectTypes = await _bookingService.GetSubjectTypesAsync();
+            return Ok(subjectTypes);
+        }
+
+        // GET /api/subjecttypes
+        [HttpGet("paymentStatus")]
+        public async Task<ActionResult<IEnumerable<Subjecttype>>> GetPaymentStatus()
+        {
+            var subjectTypes = await _bookingService.GetPaymentStatusesAsync();
             return Ok(subjectTypes);
         }
 
@@ -109,20 +118,31 @@ namespace HaNoiTravel.Controllers
                 return BadRequest(new { message = "Failed to create booking." });
             }
         }
-        // --- NEW: Get bookings for a specific customer endpoint ---
-        // GET /api/customers/{customerId}/bookings
         [HttpGet("customers/{customerId}/bookings")]
-        public async Task<ActionResult<IEnumerable<BookingResponse>>> GetCustomerBookings(int customerId)
+        public async Task<ActionResult<Pagination<BookingResponse>>> GetCustomerBookings(
+            int customerId,
+            [FromQuery] int pageIndex = 0, // Default page index
+            [FromQuery] int pageSize = 10) // Default page size
         {
-            var bookings = await _bookingService.GetCustomerBookingsAsync(customerId);
+            var paginatedBookings = await _bookingService.GetCustomerBookingsAsync(customerId, pageIndex, pageSize);
 
-            if (bookings == null || !bookings.Any())
+            if (paginatedBookings == null || !paginatedBookings.Items.Any())
             {
                 // Return 200 OK with an empty list if no bookings are found for this customer.
-                return Ok(new List<BookingResponse>());
+                return Ok(new Pagination<BookingResponse>());
             }
 
-            return Ok(bookings);
+            return Ok(paginatedBookings);
+        }
+        [HttpGet("bookings/{bookingId}")]
+        public async Task<ActionResult<BookingAdminDto>> GetBookingById(int bookingId)
+        {
+            var booking = await _bookingService.GetBookingByIdAsync(bookingId);
+            if (booking == null)
+            {
+                return NotFound();
+            }
+            return Ok(booking);
         }
     }
 }

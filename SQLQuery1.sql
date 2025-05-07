@@ -366,6 +366,10 @@ ALTER TABLE [ORDERS] ADD  FOREIGN KEY([ORDERSTATUSID]) REFERENCES [ORDERSTATUS] 
 GO
 ALTER TABLE [SUBJECTS] ADD  FOREIGN KEY([TYPEID]) REFERENCES [SUBJECTTYPES] ([TYPEID])  ON UPDATE NO ACTION ON DELETE NO ACTION 
 GO
+ALTER TABLE [BOOKINGS] ADD [PaymentStatusID] INTEGER NULL;
+GO
+ALTER TABLE [BOOKINGS] ADD FOREIGN KEY ([PaymentStatusID]) REFERENCES [PAYMENTSTATUS] ([PAYMENTSTATUSID]);
+GO
 ALTER TABLE [CUSTOMERS]
 ADD CONSTRAINT UQ_CUSTOMERS_USERID  UNIQUE ([USERID]);
 
@@ -381,7 +385,22 @@ ON DELETE CASCADE;
 
 
 
-
+--TRIGGER
+CREATE TRIGGER trg_UpdateTransactionPaymentStatus
+ON BOOKINGS
+AFTER UPDATE
+AS
+BEGIN
+    IF UPDATE(PaymentStatusID)
+    BEGIN
+        UPDATE T
+        SET T.PaymentStatusID = I.PaymentStatusID
+        FROM TRANSACTIONS T
+        INNER JOIN TRANSACTION_ITEMS TI ON T.TransactionID = TI.TransactionID
+        INNER JOIN INSERTED I ON TI.BookingID = I.BOOKINGID;
+    END
+END;
+GO
 
 
 
@@ -451,11 +470,8 @@ INSERT INTO [PAYMENTSTATUS] ([STATUSNAME]) VALUES
 (N'Failed'),
 (N'Refunded');
 GO
-
+INSERT INTO [PAYMENTSTATUS] ([STATUSNAME]) VALUES (N'Cancelled')
 SELECT * FROM [USER]
-UPDATE [USER] 
-SET USERNAME = 'admin', ROLEID = '1'
-WHERE USERID = '11'
 -- Thêm dữ liệu mẫu vào bảng USER (Liên kết với ROLES)
 PRINT 'Inserting data into USER...';
 INSERT INTO [USER] ([USERNAME], [PASSWORDHASH], [EMAIL], [PHONENUMBER], [ISACTIVE], [ROLEID]) VALUES
@@ -464,8 +480,6 @@ INSERT INTO [USER] ([USERNAME], [PASSWORDHASH], [EMAIL], [PHONENUMBER], [ISACTIV
 ('staff1', 'hashed_password_staff1', 'staff1@example.com', '0903333333', 1, 3), -- Role: Staff
 ('admin1', 'hashed_password_admin1', 'admin1@example.com', '0904444444', 1, 1); -- Role: Admin
 GO
-SELECT * FROM [CUSTOMERS]
-DELETE FROM [CUSTOMERS]
 -- Thêm dữ liệu mẫu vào bảng CUSTOMERS (Liên kết với USER)
 PRINT 'Inserting data into CUSTOMERS...';
 INSERT INTO [CUSTOMERS] ([USERID], [FIRSTNAME], [LASTNAME], [DATEOFBIRTH], [GENDER], [CREATEDAT]) VALUES
@@ -480,14 +494,8 @@ INSERT INTO [ADDRESSES] ([CUSTOMERID], [COUNTRY], [STREET], [WARD], [DISTRICT], 
 (16, N'Vietnam', N'Đường 70', N'Phường Tây Tựu', N'Quận Bắc Từ Liêm', N'Hà Nội'), -- CUSTOMERID 1
 (17, N'Vietnam', N'Đường B', N'Phường Tây Tựu', N'Quận Bắc Từ Liêm', N'Hà Nội'); -- CUSTOMERID 2
 GO
-SELECT * FROM [ADDRESSES]
-DELETE  FROM [ADDRESSES]
 -- Thêm dữ liệu mẫu vào bảng SERVICEGROUPS (Loại dịch vụ chung)
 PRINT 'Updating data for SERVICEGROUPS...';
--- Xóa dữ liệu cũ nếu cần
--- DELETE FROM [SERVICEGROUPS];
-SELECT * FROM SERVICEGROUPS
-DELETE FROM SERVICEGROUPS
 INSERT INTO [SERVICEGROUPS] ([NAME]) VALUES
 (N'Chăm sóc cơ bản'), -- Có thể áp dụng cho cả 3 đối tượng
 (N'Y tế và sức khỏe'), -- Áp dụng cho Người già, Trẻ em, Thú cưng
@@ -538,10 +546,10 @@ INSERT INTO [SERVICES] ([SUBJECTTYPEID], [SERVICEGROUPID], [NAME], [DESCRIPTION]
 GO
 
 INSERT INTO [PRODUCTS] ([CATEGORYID], [NAME], [DESCRIPTION], [PRICE], [STOCKQUANTITY], [IMAGEURL], [SKU], [ISACTIVE], [CREATEDAT]) VALUES
-(3, N'Thức ăn cho chó loại A', N'Thức ăn dinh dưỡng cao', 150000.00, 100, 'url_to_image_dog_food', 'SKU-DOG-A', 1, GETDATE()), -- Liên kết với 'Sản phẩm cho Thú Cưng'
-(3, N'Cát vệ sinh cho mèo', N'Cát thấm hút tốt', 80000.00, 200, 'url_to_image_cat_litter', 'SKU-CAT-B', 1, GETDATE()), -- Liên kết với 'Sản phẩm cho Thú Cưng'
-(1, N'Sữa dinh dưỡng cho người già', N'Sữa bổ sung canxi', 300000.00, 50, 'url_to_image_old_milk', 'SKU-OLD-MILK', 1, GETDATE()), -- Liên kết với 'Sản phẩm cho Người Già'
-(2, N'Bỉm trẻ em size M', N'Bỉm siêu thấm', 250000.00, 150, 'url_to_image_baby_diaper', 'SKU-BABY-DIAPER', 1, GETDATE()); -- Liên kết với 'Sản phẩm cho Trẻ Em'
+(3, N'Thức ăn cho mèo loại A', N'Thức ăn dinh dưỡng cao', 70000.00, 500, 'url_to_image_dog_food', 'SKU-DOG-123', 1, GETDATE()), -- Liên kết với 'Sản phẩm cho Thú Cưng'
+(3, N'Xích chó', N'Xích inox', 90000.00, 100, 'url_to_image_cat_litter', 'SKU-CAT-123', 1, GETDATE()), -- Liên kết với 'Sản phẩm cho Thú Cưng'
+(1, N'Sửa Ensure', N'Sữa bổ sung canxi', 600000.00, 250, 'url_to_image_old_milk', 'SKU-OLD-321', 1, GETDATE()), -- Liên kết với 'Sản phẩm cho Người Già'
+(2, N'Đồ chơi cho trẻ', N'Bỉm siêu thấm', 350000.00, 350, 'url_to_image_baby_diaper', 'SKU-BABY-258', 1, GETDATE()); -- Liên kết với 'Sản phẩm cho Trẻ Em'
 GO
 
 -- chưa động đến
@@ -568,6 +576,15 @@ SELECT * FROM [RefreshTokens]
 SELECT * FROM BOOKINGS
 SELECT * FROM STAFF
 SELECT * FROM [USER]
+SELECT * FROM PRODUCTS
+SELECT * FROM PAYMENTMETHOD
+	UPDATE PAYMENTSTATUS
+	SET STATUSNAME = 'MoMo'
+	WHERE  PAYMENTMETHODID = '2'
+
+SELECT * FROM [TRANSACTIONS]
+SELECT * FROM PAYMENTSTATUS
+SELECT * FROM [TRANSACTION_ITEMS]
 
 
 

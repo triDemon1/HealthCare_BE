@@ -25,5 +25,6 @@ namespace HaNoiTravel.DTOS
         public int StatusId { get; set; } // Trạng thái mới (vẫn cần cập nhật trạng thái)
 
         public string? Notes { get; set; } // Ghi chú (có thể null)
+        public int? PaymentStatusId { get; set; }
     }
 }

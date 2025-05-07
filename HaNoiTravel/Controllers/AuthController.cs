@@ -93,7 +93,8 @@ namespace HaNoiTravel.Controllers
                 int userID = loginResult.UserId;
                 string userName = loginResult.UserName;
                 int? Customerid = loginResult.CustomerId;
-                return Ok(new { Userid = userID,  Username = userName, Role = role, Customerid = Customerid });
+                int? AddressId = loginResult.AddressId;
+                return Ok(new { Userid = userID,  Username = userName, Role = role, Customerid = Customerid, AddressId = AddressId });
             }
             catch (InvalidOperationException ex)
             {
