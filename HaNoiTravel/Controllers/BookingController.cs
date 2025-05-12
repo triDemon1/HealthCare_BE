@@ -118,18 +118,59 @@ namespace HaNoiTravel.Controllers
                 return BadRequest(new { message = "Failed to create booking." });
             }
         }
+        // Endpoint mới để hủy booking
+        [HttpPut("cancel/{bookingId}")] // Sử dụng HttpPut vì đây là hành động cập nhật trạng thái
+        public async Task<ActionResult> CancelBooking(int bookingId)
+        {
+            // Lấy CustomerId từ token hoặc claims (đảm bảo người dùng hiện tại là chủ sở hữu booking)
+            var customerIdClaim = User.FindFirst(ClaimTypes.NameIdentifier); // Hoặc claim nào bạn dùng cho CustomerId
+            if (customerIdClaim == null || !int.TryParse(customerIdClaim.Value, out int customerId))
+            {
+                return Unauthorized(new { message = "Không xác định được thông tin khách hàng." });
+            }
+
+            var success = await _bookingService.CancelBookingAsync(bookingId, customerId);
+
+            if (success)
+            {
+                return Ok(new { message = $"Booking {bookingId} đã được hủy thành công." });
+            }
+            else
+            {
+                // Trả về 400 nếu booking không tồn tại, không thuộc về khách hàng hoặc không thể hủy
+                return BadRequest(new { message = $"Không thể hủy booking {bookingId}. Booking không tồn tại, không thuộc về bạn hoặc đã ở trạng thái không thể hủy." });
+            }
+        }
+
+
+        // Cập nhật endpoint GetCustomerBookings để nhận tham số tìm kiếm
         [HttpGet("customers/{customerId}/bookings")]
         public async Task<ActionResult<Pagination<BookingResponse>>> GetCustomerBookings(
             int customerId,
-            [FromQuery] int pageIndex = 0, // Default page index
-            [FromQuery] int pageSize = 10) // Default page size
+            [FromQuery] int pageIndex = 0,
+            [FromQuery] int pageSize = 10,
+            [FromQuery] string? searchTerm = null) // Thêm tham số tìm kiếm
         {
-            var paginatedBookings = await _bookingService.GetCustomerBookingsAsync(customerId, pageIndex, pageSize);
+            // Tùy chọn: Kiểm tra customerId từ route có khớp với customerId từ token không
+            var customerIdClaim = User.FindFirst(ClaimTypes.NameIdentifier); // Hoặc claim nào bạn dùng cho CustomerId
+            if (customerIdClaim == null || !int.TryParse(customerIdClaim.Value, out int authenticatedCustomerId) || authenticatedCustomerId != customerId)
+            {
+                return Unauthorized(new { message = "Bạn không có quyền xem lịch sử đặt lịch của khách hàng này." });
+            }
+
+
+            var paginatedBookings = await _bookingService.GetCustomerBookingsAsync(customerId, pageIndex, pageSize, searchTerm); // Truyền searchTerm vào service
 
             if (paginatedBookings == null || !paginatedBookings.Items.Any())
             {
-                // Return 200 OK with an empty list if no bookings are found for this customer.
-                return Ok(new Pagination<BookingResponse>());
+                // Vẫn trả về 200 OK với danh sách rỗng và tổng số 0 khi không tìm thấy kết quả
+                return Ok(new Pagination<BookingResponse>
+                {
+                    Items = new List<BookingResponse>(), // hoặc dữ liệu thực tế
+                    TotalCount = 0,  // số lượng total items
+                    PageIndex = pageIndex,
+                    PageSize = pageSize
+                });
             }
 
             return Ok(paginatedBookings);

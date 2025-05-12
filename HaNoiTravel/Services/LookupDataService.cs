@@ -33,5 +33,11 @@ namespace HaNoiTravel.Services
                .Select(os => new OrderStatusDto { OrderStatusId = os.Orderstatusid, StatusName = os.Statusname })
                .ToListAsync();
         }
+        public async Task<IEnumerable<CategoryDto>> GetAllCategoriesAsync()
+        {
+            return await _context.Categories
+                .Select(c => new CategoryDto { CategoryId = c.Categoryid, Name = c.Name })
+                .ToListAsync();
+        }
     }
 }

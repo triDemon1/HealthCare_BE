@@ -5,6 +5,7 @@
         public int OrderId { get; set; }
         public int CustomerId { get; set; }
         public string CustomerName { get; set; } // Tên Customer
+        public string phoneNumber { get; set; }
         public int OrderStatusId { get; set; }
         public string OrderStatusName { get; set; } // Tên trạng thái Order
         public int AddressId { get; set; }

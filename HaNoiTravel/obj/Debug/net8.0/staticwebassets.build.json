@@ -1,11 +1,19 @@
 {
   "Version": 1,
-  "Hash": "T+eswCV6CTgOzC0CoOK2l9XJM3jZrHhPH0uObdsMfIE=",
+  "Hash": "zkiDzjtnQTbWhIfYfuKr0JXBpC4H/4QRGjfptnz5PeE=",
   "Source": "HaNoiTravel",
   "BasePath": "_content/HaNoiTravel",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [],
-  "DiscoveryPatterns": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "HaNoiTravel\\wwwroot",
+      "Source": "HaNoiTravel",
+      "ContentRoot": "D:\\DATN\\HaNoiTravel\\HaNoiTravel\\wwwroot\\",
+      "BasePath": "_content/HaNoiTravel",
+      "Pattern": "**"
+    }
+  ],
   "Assets": []
 }

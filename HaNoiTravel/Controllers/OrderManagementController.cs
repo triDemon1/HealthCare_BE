@@ -18,9 +18,14 @@ namespace HaNoiTravel.Controllers
         }
         [HttpGet("admin/orders")]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<IEnumerable<OrderAdminDto>>> GetAllOrders()
+        public async Task<ActionResult<IEnumerable<OrderAdminDto>>> GetAllOrders([FromQuery] int pageIndex = 0, [FromQuery] int pageSize = 10)
         {
-            var orders = await _orderManagementService.GetAllOrdersAsync();
+            if (pageIndex < 0 || pageSize <= 0)
+            {
+                return BadRequest("Invalid pagination parameters.");
+            }
+
+            var orders = await _orderManagementService.GetAllOrdersAsync(pageIndex, pageSize);
             return Ok(orders);
         }
 
@@ -36,6 +41,7 @@ namespace HaNoiTravel.Controllers
             return Ok(order);
         }
         [HttpPut("admin/orders/{orderId}/status")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<OrderAdminDto>> UpdateOrderStatus(int orderId, [FromBody] StatusUpdateDto statusDto)
         {
             if (!ModelState.IsValid)

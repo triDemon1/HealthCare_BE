@@ -8,5 +8,6 @@ namespace HaNoiTravel.Interfaces
         Task<IEnumerable<RoleDto>> GetAllRolesAsync();
         Task<IEnumerable<BookingStatusDto>> GetAllBookingStatusesAsync();
         Task<IEnumerable<OrderStatusDto>> GetAllOrderStatusAsync();
+        Task<IEnumerable<CategoryDto>> GetAllCategoriesAsync();
     }
 }

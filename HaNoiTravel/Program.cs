@@ -5,9 +5,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using Microsoft.AspNetCore.Hosting; // Added for WebHostDefaults
+using Microsoft.Extensions.Hosting; // Added for Host
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.WebHost.UseWebRoot("wwwroot");
 // Add services to the container.
 builder.Services.AddCors(options =>
 {

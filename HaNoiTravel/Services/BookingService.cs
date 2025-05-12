@@ -149,38 +149,49 @@ namespace HaNoiTravel.Services
             return result > 0; // Return true if at least one entity was saved (the booking)
                                // Note: SaveChangesAsync() was already called for new Subject if applicable.
         }
-        public async Task<Pagination<BookingResponse>> GetCustomerBookingsAsync(int customerId, int pageIndex, int pageSize)
+        public async Task<Pagination<BookingResponse>> GetCustomerBookingsAsync(
+             int customerId,
+             int pageIndex,
+             int pageSize,
+             string? searchTerm = null)
         {
             var query = _context.Bookings
                 .Where(b => b.Customerid == customerId)
-                .Include(b => b.Service) // Include related Service data
-                .Include(b => b.Subject) // Include related Subject data
-                .Include(b => b.Status) // Include related BookingStatus data
+                .Include(b => b.Service)
+                .Include(b => b.Subject)
+                .Include(b => b.Status)
                 .Include(b => b.PaymentStatus)
-                .OrderByDescending(b => b.Scheduledstarttime); // Order by date, newest first
+                .AsQueryable();
+
+            // Áp dụng bộ lọc tìm kiếm nếu có searchTerm
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                query = query.Where(b => b.Subject != null && b.Subject.Name.Contains(searchTerm));
+            }
+
+            query = query.OrderByDescending(b => b.Scheduledstarttime);
 
             var totalCount = await query.CountAsync();
 
             var bookings = await query
                 .Skip(pageIndex * pageSize)
                 .Take(pageSize)
-                .Select(b => new BookingResponse // Map to a DTO for cleaner response
+                .Select(b => new BookingResponse
                 {
                     BookingId = b.Bookingid,
                     ServiceId = b.Serviceid,
-                    ServiceName = b.Service.Name, // Get name from included Service
+                    ServiceName = b.Service.Name,
                     SubjectId = b.Subjectid,
-                    SubjectName = b.Subject.Name, // Get name from included Subject
+                    SubjectName = b.Subject.Name,
                     StatusId = b.Statusid,
-                    StatusName = b.Status.Statusname, // Get name from included BookingStatus
+                    StatusName = b.Status.Statusname,
                     ScheduledStartTime = b.Scheduledstarttime,
                     ScheduledEndTime = b.Scheduledendtime,
                     PriceAtBooking = b.Priceatbooking,
                     Notes = b.Notes,
                     CreatedAt = b.Createdat,
-                    PaymentStatusId = b.PaymentStatus.Paymentstatusid,
-                    paymentStatusName = b.PaymentStatus != null ? b.PaymentStatus.Statusname : "Chưa thanh toán" // Hiển thị "Chưa thanh toán" nếu PaymentStatusId null
-                    // Add other fields you want to expose to the frontend
+                    PaymentStatusId = b.PaymentStatus != null ? b.PaymentStatus.Paymentstatusid : null,
+                    paymentStatusName = b.PaymentStatus != null ? b.PaymentStatus.Statusname : "Chưa thanh toán"
                 })
                 .ToListAsync();
 
@@ -191,6 +202,56 @@ namespace HaNoiTravel.Services
                 PageIndex = pageIndex,
                 PageSize = pageSize
             };
+        }
+        public async Task<bool> CancelBookingAsync(int bookingId, int customerId)
+        {
+            // Tìm booking cần hủy, bao gồm trạng thái booking và trạng thái thanh toán
+            var booking = await _context.Bookings
+                                        .Include(b => b.Status)
+                                        .Include(b => b.PaymentStatus)
+                                        .FirstOrDefaultAsync(b => b.Bookingid == bookingId && b.Customerid == customerId);
+
+            // Kiểm tra xem booking có tồn tại, thuộc về khách hàng này
+            // VÀ trạng thái booking KHÔNG phải là "Cancelled" hoặc "Completed"
+            // VÀ trạng thái thanh toán KHÔNG phải là "Completed"
+            if (booking == null ||
+                booking.Status.Statusname == "Cancelled" ||
+                booking.Status.Statusname == "Completed" ||
+                (booking.PaymentStatus != null && booking.PaymentStatus.Statusname == "Completed")) // Kiểm tra trạng thái thanh toán
+            {
+                // Log lý do không hủy được để debug (tùy chọn)
+                if (booking == null) Console.WriteLine($"Booking {bookingId} not found for customer {customerId}.");
+                else if (booking.Status.Statusname == "Cancelled") Console.WriteLine($"Booking {bookingId} is already cancelled.");
+                else if (booking.Status.Statusname == "Completed") Console.WriteLine($"Booking {bookingId} is already completed.");
+                else if (booking.PaymentStatus != null && booking.PaymentStatus.Statusname == "Completed") Console.WriteLine($"Booking {bookingId} is already paid.");
+
+                return false; // Không thể hủy booking
+            }
+
+            // Tìm ID của trạng thái "Cancelled" trong BookingStatus
+            var cancelledBookingStatus = await _context.Bookingstatuses
+                                                     .FirstOrDefaultAsync(bs => bs.Statusname == "Cancelled");
+
+            // Tìm ID của trạng thái "Cancelled" trong PaymentStatus
+            var cancelledPaymentStatus = await _context.Paymentstatuses
+                                                     .FirstOrDefaultAsync(ps => ps.Statusname == "Cancelled");
+
+
+            if (cancelledBookingStatus == null || cancelledPaymentStatus == null)
+            {
+                // Xử lý lỗi: Không tìm thấy trạng thái "Cancelled" trong DB
+                Console.Error.WriteLine("Status 'Cancelled' not found in database for BookingStatus or PaymentStatus.");
+                return false;
+            }
+
+            // Cập nhật trạng thái booking và trạng thái thanh toán
+            booking.Statusid = cancelledBookingStatus.Statusid;
+            booking.PaymentStatusId = cancelledPaymentStatus.Paymentstatusid;
+            booking.Updatedat = System.DateTime.Now;
+
+            var result = await _context.SaveChangesAsync();
+
+            return result > 0;
         }
         public async Task<BookingAdminDto?> GetBookingByIdAsync(int bookingId)
         {

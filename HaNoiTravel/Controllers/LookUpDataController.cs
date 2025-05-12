@@ -38,5 +38,12 @@ namespace HaNoiTravel.Controllers
             var statuses = await _lookupDataService.GetAllOrderStatusAsync();
             return Ok(statuses);
         }
+        [HttpGet("categories")] // Ví dụ route: /api/LookupData/categories
+        // [Authorize(Roles = "Admin")] // Bỏ comment nếu chỉ Admin mới được lấy danh mục
+        public async Task<ActionResult<IEnumerable<CategoryDto>>> GetAllCategories()
+        {
+            var categories = await _lookupDataService.GetAllCategoriesAsync();
+            return Ok(categories);
+        }
     }
 }
