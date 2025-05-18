@@ -11,6 +11,7 @@ namespace HaNoiTravel.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class BookingManagementController : ControllerBase
     {
         private readonly IBookingManagementService _bookingManagementService;
@@ -19,7 +20,6 @@ namespace HaNoiTravel.Controllers
             _bookingManagementService = bookingManagementService;
         }
         [HttpGet("admin/bookings")]
-        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<IEnumerable<BookingAdminDto>>> GetAllBookings()
         {
             var bookings = await _bookingManagementService.GetAllBookingsAsync();
@@ -27,7 +27,6 @@ namespace HaNoiTravel.Controllers
         }
 
         [HttpGet("admin/bookings/{bookingId}")]
-        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<BookingAdminDto>> GetBookingById(int bookingId)
         {
             var booking = await _bookingManagementService.GetBookingByIdAsync(bookingId);

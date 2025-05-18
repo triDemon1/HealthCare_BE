@@ -422,6 +422,7 @@ INSERT INTO [ROLES] ([ROLEID], [ROLENAME]) VALUES
 (2, N'Customer'),
 (3, N'Staff');
 GO
+SELECT * FROM ROLES
 -- Thêm dữ liệu mẫu vào bảng SUBJECTTYPES
 SELECT * FROM [SUBJECTTYPES]
 PRINT 'Inserting data into SUBJECTTYPES...';
@@ -439,6 +440,7 @@ INSERT INTO [BOOKINGSTATUS] ([STATUSNAME]) VALUES
 (N'Completed'),
 (N'Cancelled');
 GO
+SELECT * FROM [BOOKINGSTATUS]
 
 SELECT * FROM [ORDERSTATUS]
 -- Thêm dữ liệu mẫu vào bảng ORDERSTATUS
@@ -487,6 +489,7 @@ INSERT INTO [CUSTOMERS] ([USERID], [FIRSTNAME], [LASTNAME], [DATEOFBIRTH], [GEND
 (6, N'Bùi', N'Quang Hưng', '2003-08-01', 0, GETDATE()),-- USERID 2 is customer2
 (9, N'Trí', N'Messi', '2003-08-01', 1, GETDATE());
 GO
+SELECT * FROM [CUSTOMERS]
 INSERT INTO [CUSTOMERS] ([USERID], [FIRSTNAME], [LASTNAME], [DATEOFBIRTH], [GENDER], [CREATEDAT]) VALUES (9, N'Trí', N'Messi', '2003-08-01', 1, GETDATE())
 -- Thêm dữ liệu mẫu vào bảng ADDRESSES (Liên kết với CUSTOMERS)
 PRINT 'Inserting data into ADDRESSES...';
@@ -494,6 +497,8 @@ INSERT INTO [ADDRESSES] ([CUSTOMERID], [COUNTRY], [STREET], [WARD], [DISTRICT], 
 (16, N'Vietnam', N'Đường 70', N'Phường Tây Tựu', N'Quận Bắc Từ Liêm', N'Hà Nội'), -- CUSTOMERID 1
 (17, N'Vietnam', N'Đường B', N'Phường Tây Tựu', N'Quận Bắc Từ Liêm', N'Hà Nội'); -- CUSTOMERID 2
 GO
+
+SELECT * FROM [ADDRESSES]
 -- Thêm dữ liệu mẫu vào bảng SERVICEGROUPS (Loại dịch vụ chung)
 PRINT 'Updating data for SERVICEGROUPS...';
 INSERT INTO [SERVICEGROUPS] ([NAME]) VALUES
@@ -504,7 +509,7 @@ INSERT INTO [SERVICEGROUPS] ([NAME]) VALUES
 (N'Chó'),
 (N'Mèo')
 GO
-
+SELECT * FROM [SERVICEGROUPS]
 -- Thêm dữ liệu mẫu vào bảng CATEGORIES (Phân loại sản phẩm/dịch vụ theo đối tượng và loại)
 PRINT 'Updating data for CATEGORIES...';
 -- Xóa dữ liệu cũ nếu cần
@@ -514,36 +519,38 @@ INSERT INTO [CATEGORIES] ([NAME], [PARENTCATOREGORYID], [DESCRIPTION], [CREATEDA
 (N'Sản phẩm cho Trẻ Em', NULL, N'Các sản phẩm dành cho trẻ em', GETDATE()),    -- CATEGORYID 2 (Ví dụ)
 (N'Sản phẩm cho Thú Cưng', NULL, N'Các sản phẩm dành cho thú cưng', GETDATE()); -- CATEGORYID 3 (Ví dụ)
 GO
+
+SELECT * FROM [CATEGORIES]
 PRINT 'Inserting data into SERVICES...';
- DELETE FROM [SERVICES]; -- Xóa dữ liệu cũ nếu cần
 INSERT INTO [SERVICES] ([SUBJECTTYPEID], [SERVICEGROUPID], [NAME], [DESCRIPTION], [DURATION], [PRICE], [ISACTIVE], [CREATEDAT]) VALUES
 -- Dịch vụ cho Thú Cưng (SUBJECTTYPEID = 3)
-(3, 19, N'Tắm và sấy khô cho chó', N'Dịch vụ tắm và sấy khô cơ bản', 60, 200000.00, 1, GETDATE()), -- SERVICEID 1 (Ví dụ), Subject: Thú Cưng, Group: Làm đẹp & Vệ sinh
-(3, 19, N'Huấn luyện cơ bản', N'Huấn luyện định kỳ', 45, 350000.00, 1, GETDATE()), -- SERVICEID 2 (Ví dụ), Subject: Thú Cưng, Group: Chăm sóc sức khỏe
-(3, 19, N'Chăm sóc tại nhà', N'Hướng dẫn chăm sóc tại nhà', 65, 950000.00, 1, GETDATE()), -- SERVICEID 2 (Ví dụ), Subject: Thú Cưng, Group: Chăm sóc sức khỏe
-(3, 20, N'Vệ sinh khay cát', N'Cách vệ sinh khay cát', 75, 750000.00, 1, GETDATE()), -- SERVICEID 2 (Ví dụ), Subject: Thú Cưng, Group: Chăm sóc sức khỏe
-(3, 20, N'Chải lông', N'Chải lông', 35, 250000.00, 1, GETDATE()), -- SERVICEID 2 (Ví dụ), Subject: Thú Cưng, Group: Chăm sóc sức khỏe
-(3, 20, N'Kiểm tra sức khỏe', N'Kiểm tra sức khỏe định kỳ', 45, 550000.00, 1, GETDATE()), -- SERVICEID 2 (Ví dụ), Subject: Thú Cưng, Group: Chăm sóc sức khỏe
+(3, 5, N'Tắm và sấy khô cho chó', N'Dịch vụ tắm và sấy khô cơ bản', 60, 200000.00, 1, GETDATE()), -- SERVICEID 1 (Ví dụ), Subject: Thú Cưng, Group: Làm đẹp & Vệ sinh
+(3, 5, N'Huấn luyện cơ bản', N'Huấn luyện định kỳ', 45, 350000.00, 1, GETDATE()), -- SERVICEID 2 (Ví dụ), Subject: Thú Cưng, Group: Chăm sóc sức khỏe
+(3, 5, N'Chăm sóc tại nhà', N'Hướng dẫn chăm sóc tại nhà', 65, 950000.00, 1, GETDATE()), -- SERVICEID 2 (Ví dụ), Subject: Thú Cưng, Group: Chăm sóc sức khỏe
+(3, 6, N'Vệ sinh khay cát', N'Cách vệ sinh khay cát', 75, 750000.00, 1, GETDATE()), -- SERVICEID 2 (Ví dụ), Subject: Thú Cưng, Group: Chăm sóc sức khỏe
+(3, 6, N'Chải lông', N'Chải lông', 35, 250000.00, 1, GETDATE()), -- SERVICEID 2 (Ví dụ), Subject: Thú Cưng, Group: Chăm sóc sức khỏe
+(3, 6, N'Kiểm tra sức khỏe', N'Kiểm tra sức khỏe định kỳ', 45, 550000.00, 1, GETDATE()), -- SERVICEID 2 (Ví dụ), Subject: Thú Cưng, Group: Chăm sóc sức khỏe
 
 -- Dịch vụ cho Người Già (SUBJECTTYPEID = 1)
-(1, 15, N'Tắm rửa (Người Già)', N'abc', 120, 500000.00, 1, GETDATE()), -- SERVICEID 3 (Ví dụ), Subject: Người Già, Group: Hỗ trợ sinh hoạt
-(1, 15, N'Vệ Sinh Cá Nhân (Người Già)', N'Y tá đến kiểm tra sức khỏe', 60, 400000.00, 1, GETDATE()), -- SERVICEID 4 (Ví dụ), Subject: Người Già, Group: Chăm sóc sức khỏe
-(1, 15, N'Cho ăn (Người Già)', N'abc', 120, 500000.00, 1, GETDATE()),
-(1, 16, N'The dõi thuốc (Người Già)', N'ac', 120, 500000.00, 1, GETDATE()),
-(1, 16, N'Tập thể dục (Người Già)', N'kkkk', 120, 500000.00, 1, GETDATE()),
-(1, 16, N'Kiểm tra định kỳ (Người Già)', N'123', 120, 500000.00, 1, GETDATE()),
+(1, 1, N'Tắm rửa (Người Già)', N'abc', 120, 500000.00, 1, GETDATE()), -- SERVICEID 3 (Ví dụ), Subject: Người Già, Group: Hỗ trợ sinh hoạt
+(1, 1, N'Vệ Sinh Cá Nhân (Người Già)', N'Y tá đến kiểm tra sức khỏe', 60, 400000.00, 1, GETDATE()), -- SERVICEID 4 (Ví dụ), Subject: Người Già, Group: Chăm sóc sức khỏe
+(1, 1, N'Cho ăn (Người Già)', N'abc', 120, 500000.00, 1, GETDATE()),
+(1, 2, N'The dõi thuốc (Người Già)', N'ac', 120, 500000.00, 1, GETDATE()),
+(1, 2, N'Tập thể dục (Người Già)', N'kkkk', 120, 500000.00, 1, GETDATE()),
+(1, 2, N'Kiểm tra định kỳ (Người Già)', N'123', 120, 500000.00, 1, GETDATE()),
 
 
 -- Dịch vụ cho Trẻ Em (SUBJECTTYPEID = 2)
-(2, 17, N'Tắm cho bé', N'Trông nom và chăm sóc trẻ', 180, 600000.00, 1, GETDATE()), -- SERVICEID 5 (Ví dụ), Subject: Trẻ Em, Group: Hỗ trợ sinh hoạt
+(2, 3, N'Tắm cho bé', N'Trông nom và chăm sóc trẻ', 180, 600000.00, 1, GETDATE()), -- SERVICEID 5 (Ví dụ), Subject: Trẻ Em, Group: Hỗ trợ sinh hoạt
 
-(2, 17, N'Cho bé bú', N'hhhhh', 120, 500000.00, 1, GETDATE()),
-(2, 17, N'Thay tã', N'Hỗ hhhh', 120, 500000.00, 1, GETDATE()),
-(2, 17, N'Ngủ đúng giờ', N'11111', 120, 500000.00, 1, GETDATE()),
-(2, 18, N'Chuẩn bị bữa ăn', N'11223123', 120, 500000.00, 1, GETDATE()),
-(2, 18, N'Hỗ trợ học tập', N'223232y', 120, 500000.00, 1, GETDATE()),
-(2, 18, N'Đưa đón', N'bbbbb', 120, 500000.00, 1, GETDATE())
+(2, 3, N'Cho bé bú', N'hhhhh', 120, 500000.00, 1, GETDATE()),
+(2, 3, N'Thay tã', N'Hỗ hhhh', 120, 500000.00, 1, GETDATE()),
+(2, 3, N'Ngủ đúng giờ', N'11111', 120, 500000.00, 1, GETDATE()),
+(2, 4, N'Chuẩn bị bữa ăn', N'11223123', 120, 500000.00, 1, GETDATE()),
+(2, 4, N'Hỗ trợ học tập', N'223232y', 120, 500000.00, 1, GETDATE()),
+(2, 4, N'Đưa đón', N'bbbbb', 120, 500000.00, 1, GETDATE())
 GO
+SELECT * FROM [SERVICES]
 
 INSERT INTO [PRODUCTS] ([CATEGORYID], [NAME], [DESCRIPTION], [PRICE], [STOCKQUANTITY], [IMAGEURL], [SKU], [ISACTIVE], [CREATEDAT]) VALUES
 (3, N'Thức ăn cho mèo loại A', N'Thức ăn dinh dưỡng cao', 70000.00, 500, 'url_to_image_dog_food', 'SKU-DOG-123', 1, GETDATE()), -- Liên kết với 'Sản phẩm cho Thú Cưng'
@@ -552,6 +559,7 @@ INSERT INTO [PRODUCTS] ([CATEGORYID], [NAME], [DESCRIPTION], [PRICE], [STOCKQUAN
 (2, N'Đồ chơi cho trẻ', N'Bỉm siêu thấm', 350000.00, 350, 'url_to_image_baby_diaper', 'SKU-BABY-258', 1, GETDATE()); -- Liên kết với 'Sản phẩm cho Trẻ Em'
 GO
 
+SELECT * FROM [PRODUCTS]
 -- chưa động đến
 -- Thêm dữ liệu mẫu vào bảng STAFF (Liên kết với USER)
 PRINT 'Inserting data into STAFF...';
@@ -578,11 +586,12 @@ SELECT * FROM STAFF
 SELECT * FROM [USER]
 SELECT * FROM PRODUCTS
 SELECT * FROM PAYMENTMETHOD
-	UPDATE PAYMENTSTATUS
-	SET STATUSNAME = 'MoMo'
-	WHERE  PAYMENTMETHODID = '2'
+	UPDATE [USER]
+	SET ROLEID = '1'
+	WHERE  USERID = '6'
 
 SELECT * FROM [TRANSACTIONS]
+
 SELECT * FROM PAYMENTSTATUS
 SELECT * FROM [TRANSACTION_ITEMS]
 
@@ -592,7 +601,7 @@ SELECT * FROM ORDERS
 
 SELECT * FROM ORDERSTATUS
 SELECT * FROM ORDERDETAILS
-
+SELECT * FROM [SERVICES]
 
 
 

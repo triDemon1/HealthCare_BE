@@ -15,7 +15,9 @@ namespace HaNoiTravel
             services.AddScoped<ILookupDataService, LookupDataService>();
             services.AddScoped<IBookingManagementService, BookingManagementService>();
             services.AddScoped<IOrderManagementService, OrderManagementService>();
+            services.AddScoped<IServiceManagementService, ServiceManagementService>();
             services.AddScoped<IProductService, ProductService>();
+            services.AddScoped<ICustomerService, CustomerService>();
             services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<ICustomerService, CustomerService>();
             services.AddScoped<IPaymentService, PaymentService>();

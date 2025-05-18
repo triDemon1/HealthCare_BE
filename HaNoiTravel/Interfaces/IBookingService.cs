@@ -14,5 +14,6 @@ namespace HaNoiTravel.Interfaces
         Task<Pagination<BookingResponse>> GetCustomerBookingsAsync(int customerId, int pageIndex, int pageSize, string? searchTerm);
         Task<BookingAdminDto?> GetBookingByIdAsync(int bookingId);
         Task<bool> CancelBookingAsync(int bookingId, int customerId);
+        Task<int> GetCustomerIdByUserId(int userId);
     }
 }

@@ -1,0 +1,41 @@
+{
+  "Files": [
+    {
+      "Id": "D:\\DATN\\HaNoiTravel\\HaNoiTravel\\wwwroot\\assets\\images\\products\\38954545-3602-46f2-924b-8ce79a1ac504.jpg",
+      "PackagePath": "staticwebassets\\assets\\images\\products\\38954545-3602-46f2-924b-8ce79a1ac504.jpg"
+    },
+    {
+      "Id": "D:\\DATN\\HaNoiTravel\\HaNoiTravel\\wwwroot\\assets\\images\\products\\3ec299e0-b0bc-443f-bc68-907913a65ed5.jpg",
+      "PackagePath": "staticwebassets\\assets\\images\\products\\3ec299e0-b0bc-443f-bc68-907913a65ed5.jpg"
+    },
+    {
+      "Id": "D:\\DATN\\HaNoiTravel\\HaNoiTravel\\wwwroot\\assets\\images\\products\\4819f80c-f0dd-47a2-b552-27173a825e37.jpg",
+      "PackagePath": "staticwebassets\\assets\\images\\products\\4819f80c-f0dd-47a2-b552-27173a825e37.jpg"
+    },
+    {
+      "Id": "D:\\DATN\\HaNoiTravel\\HaNoiTravel\\wwwroot\\assets\\images\\products\\b8fb3d9a-4abd-4f92-a647-2f3c43cc7058.jpg",
+      "PackagePath": "staticwebassets\\assets\\images\\products\\b8fb3d9a-4abd-4f92-a647-2f3c43cc7058.jpg"
+    },
+    {
+      "Id": "D:\\DATN\\HaNoiTravel\\HaNoiTravel\\wwwroot\\assets\\images\\products\\d7a6b19a-27ff-4145-b843-817715a5236c.jpg",
+      "PackagePath": "staticwebassets\\assets\\images\\products\\d7a6b19a-27ff-4145-b843-817715a5236c.jpg"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.HaNoiTravel.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.build.HaNoiTravel.props",
+      "PackagePath": "build\\HaNoiTravel.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildMultiTargeting.HaNoiTravel.props",
+      "PackagePath": "buildMultiTargeting\\HaNoiTravel.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildTransitive.HaNoiTravel.props",
+      "PackagePath": "buildTransitive\\HaNoiTravel.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

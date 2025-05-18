@@ -294,5 +294,10 @@ namespace HaNoiTravel.Services
 
             return booking;
         }
+        public async Task<int> GetCustomerIdByUserId (int userId)
+        {
+            var customer = _context.Customers.FirstOrDefault(c => c.Userid == userId);
+            return customer?.Customerid ?? 0;
+        }
     }
 }

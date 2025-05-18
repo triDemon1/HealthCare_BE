@@ -120,7 +120,7 @@ namespace HaNoiTravel.Services
             }
 
             var existingTransactionItems = await query.OrderByDescending(ti => ti.Transaction.Createdat).ToListAsync();
-            bool isRetryAttempt = false;
+           // bool isRetryAttempt = false;
 
             if (existingTransactionItems.Any())
             {
@@ -135,7 +135,7 @@ namespace HaNoiTravel.Services
                 }
                 if (lastTransactionStatusName == "Failed" || lastTransactionStatusName == "Cancelled")
                 {
-                    isRetryAttempt = true;
+                    //isRetryAttempt = true;
                     _logger.LogInformation($"Previous transaction for {itemType} {itemId} was {lastTransactionStatusName}. Allowing new payment attempt.");
                 }
                 else if (!string.IsNullOrEmpty(lastTransactionStatusName)) // Các trạng thái khác không mong muốn
@@ -193,9 +193,8 @@ namespace HaNoiTravel.Services
 
             // 5. Gửi yêu cầu đến MoMo
             var baseOrderIdForMomo = transaction.TransactionId.ToString();
-            string orderIdForMomo = isRetryAttempt
-                ? $"{baseOrderIdForMomo}_{DateTimeOffset.Now.ToUnixTimeMilliseconds()}"
-                : baseOrderIdForMomo;
+            string orderIdForMomo =
+                $"{baseOrderIdForMomo}_{DateTimeOffset.Now.ToUnixTimeMilliseconds()}";
 
             _logger.LogInformation($"Payment attempt. Sending to MoMo: {orderIdForMomo} (Base: {baseOrderIdForMomo})");
 
@@ -215,7 +214,7 @@ namespace HaNoiTravel.Services
 
                 if (momoResponse != null && momoResponse.ResultCode == 0)
                 {
-                    transaction.Updatedat = DateTime.UtcNow;
+                    transaction.Updatedat = DateTime.Now;
                     // Cập nhật lại Updatedat cho item nếu cần
                     await _context.SaveChangesAsync();
                     return new CreatePaymentResponse

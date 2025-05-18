@@ -157,7 +157,7 @@ namespace HaNoiTravel.Controllers
             [FromQuery] string transId,     // Mã giao dịch bên MoMo
             [FromQuery] int resultCode,     // Mã kết quả giao dịch từ MoMo
             [FromQuery] string message,     // Thông báo từ MoMo
-           // [FromQuery] string payType,
+            //[FromQuery] string payType,
             [FromQuery] long responseTime,
             [FromQuery] string extraData,   // Dữ liệu thêm (bao gồm bookingId)
             [FromQuery] string signature    // Chữ ký từ MoMo

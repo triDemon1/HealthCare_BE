@@ -18,9 +18,9 @@ namespace HaNoiTravel.Controllers
         private readonly IBookingService _bookingService;
 
 
-        public BookingController(IBookingService healthCareService)
+        public BookingController(IBookingService bookingService)
         {
-            _bookingService = healthCareService;
+            _bookingService = bookingService;
         }
 
         // GET /api/subjecttypes
@@ -122,23 +122,56 @@ namespace HaNoiTravel.Controllers
         [HttpPut("cancel/{bookingId}")] // Sử dụng HttpPut vì đây là hành động cập nhật trạng thái
         public async Task<ActionResult> CancelBooking(int bookingId)
         {
-            // Lấy CustomerId từ token hoặc claims (đảm bảo người dùng hiện tại là chủ sở hữu booking)
-            var customerIdClaim = User.FindFirst(ClaimTypes.NameIdentifier); // Hoặc claim nào bạn dùng cho CustomerId
-            if (customerIdClaim == null || !int.TryParse(customerIdClaim.Value, out int customerId))
+            // BƯỚC 1: Lấy UserID một cách đáng tin cậy từ token (ClaimTypes.NameIdentifier)
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
             {
-                return Unauthorized(new { message = "Không xác định được thông tin khách hàng." });
+                return Unauthorized(new { message = "Không xác định được thông tin người dùng từ token." });
             }
 
-            var success = await _bookingService.CancelBookingAsync(bookingId, customerId);
+            // BƯỚC 2: Dùng UserID này để truy vấn CustomerId từ DB (đáng tin cậy)
+            int customerId;
+            try
+            {
+                customerId = await _bookingService.GetCustomerIdByUserId(userId);
 
-            if (success)
-            {
-                return Ok(new { message = $"Booking {bookingId} đã được hủy thành công." });
+                if (customerId <= 0)
+                {
+                    return Unauthorized(new { message = "Thông tin khách hàng liên kết không hợp lệ." });
+                }
             }
-            else
+            catch (Exception ex)
             {
-                // Trả về 400 nếu booking không tồn tại, không thuộc về khách hàng hoặc không thể hủy
-                return BadRequest(new { message = $"Không thể hủy booking {bookingId}. Booking không tồn tại, không thuộc về bạn hoặc đã ở trạng thái không thể hủy." });
+                Console.Error.WriteLine($"Lỗi khi lấy thông tin profile cho UserID {userId}: {ex}");
+                return StatusCode(500, new { message = "Đã xảy ra lỗi khi tải thông tin người dùng. Vui lòng thử lại." });
+            }
+
+            // BƯỚC 3: Truyền CustomerId đã được xác minh vào service để thực hiện logic nghiệp vụ và xác thực quyền sở hữu
+            try
+            {
+                var success = await _bookingService.CancelBookingAsync(bookingId, customerId);
+
+                if (success)
+                {
+                    return Ok(new { message = $"Lịch đặt {bookingId} đã được hủy thành công." });
+                }
+                else
+                {
+                    return StatusCode(500, new { message = "Không thể hủy lịch đặt. Vui lòng kiểm tra lại trạng thái lịch đặt." });
+                }
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return StatusCode(403, new { message = ex.Message }); // Trả về 403 Forbidden
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Lỗi nội bộ khi hủy lịch đặt {bookingId} cho khách hàng {customerId}: {ex}");
+                return StatusCode(500, new { message = "Đã xảy ra lỗi nội bộ khi hủy lịch đặt. Vui lòng liên hệ hỗ trợ." });
             }
         }
 
@@ -152,11 +185,11 @@ namespace HaNoiTravel.Controllers
             [FromQuery] string? searchTerm = null) // Thêm tham số tìm kiếm
         {
             // Tùy chọn: Kiểm tra customerId từ route có khớp với customerId từ token không
-            var customerIdClaim = User.FindFirst(ClaimTypes.NameIdentifier); // Hoặc claim nào bạn dùng cho CustomerId
-            if (customerIdClaim == null || !int.TryParse(customerIdClaim.Value, out int authenticatedCustomerId) || authenticatedCustomerId != customerId)
-            {
-                return Unauthorized(new { message = "Bạn không có quyền xem lịch sử đặt lịch của khách hàng này." });
-            }
+            //var customerIdClaim = User.FindFirst(ClaimTypes.NameIdentifier); // Hoặc claim nào bạn dùng cho CustomerId
+            //if (customerIdClaim == null || !int.TryParse(customerIdClaim.Value, out int authenticatedCustomerId) || authenticatedCustomerId != customerId)
+            //{
+            //    return Unauthorized(new { message = "Bạn không có quyền xem lịch sử đặt lịch của khách hàng này." });
+            //}
 
 
             var paginatedBookings = await _bookingService.GetCustomerBookingsAsync(customerId, pageIndex, pageSize, searchTerm); // Truyền searchTerm vào service
