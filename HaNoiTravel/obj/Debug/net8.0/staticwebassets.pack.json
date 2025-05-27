@@ -1,24 +1,48 @@
 {
   "Files": [
     {
-      "Id": "D:\\DATN\\HaNoiTravel\\HaNoiTravel\\wwwroot\\assets\\images\\products\\38954545-3602-46f2-924b-8ce79a1ac504.jpg",
-      "PackagePath": "staticwebassets\\assets\\images\\products\\38954545-3602-46f2-924b-8ce79a1ac504.jpg"
+      "Id": "D:\\DATN\\HaNoiTravel\\HaNoiTravel\\wwwroot\\assets\\images\\products\\1.jpg",
+      "PackagePath": "staticwebassets\\assets\\images\\products\\1.jpg"
     },
     {
-      "Id": "D:\\DATN\\HaNoiTravel\\HaNoiTravel\\wwwroot\\assets\\images\\products\\3ec299e0-b0bc-443f-bc68-907913a65ed5.jpg",
-      "PackagePath": "staticwebassets\\assets\\images\\products\\3ec299e0-b0bc-443f-bc68-907913a65ed5.jpg"
+      "Id": "D:\\DATN\\HaNoiTravel\\HaNoiTravel\\wwwroot\\assets\\images\\products\\2.jpg",
+      "PackagePath": "staticwebassets\\assets\\images\\products\\2.jpg"
     },
     {
-      "Id": "D:\\DATN\\HaNoiTravel\\HaNoiTravel\\wwwroot\\assets\\images\\products\\4819f80c-f0dd-47a2-b552-27173a825e37.jpg",
-      "PackagePath": "staticwebassets\\assets\\images\\products\\4819f80c-f0dd-47a2-b552-27173a825e37.jpg"
+      "Id": "D:\\DATN\\HaNoiTravel\\HaNoiTravel\\wwwroot\\assets\\images\\products\\3.jpg",
+      "PackagePath": "staticwebassets\\assets\\images\\products\\3.jpg"
     },
     {
-      "Id": "D:\\DATN\\HaNoiTravel\\HaNoiTravel\\wwwroot\\assets\\images\\products\\b8fb3d9a-4abd-4f92-a647-2f3c43cc7058.jpg",
-      "PackagePath": "staticwebassets\\assets\\images\\products\\b8fb3d9a-4abd-4f92-a647-2f3c43cc7058.jpg"
+      "Id": "D:\\DATN\\HaNoiTravel\\HaNoiTravel\\wwwroot\\assets\\images\\products\\4.jpg",
+      "PackagePath": "staticwebassets\\assets\\images\\products\\4.jpg"
     },
     {
-      "Id": "D:\\DATN\\HaNoiTravel\\HaNoiTravel\\wwwroot\\assets\\images\\products\\d7a6b19a-27ff-4145-b843-817715a5236c.jpg",
-      "PackagePath": "staticwebassets\\assets\\images\\products\\d7a6b19a-27ff-4145-b843-817715a5236c.jpg"
+      "Id": "D:\\DATN\\HaNoiTravel\\HaNoiTravel\\wwwroot\\assets\\images\\products\\5.jpg",
+      "PackagePath": "staticwebassets\\assets\\images\\products\\5.jpg"
+    },
+    {
+      "Id": "D:\\DATN\\HaNoiTravel\\HaNoiTravel\\wwwroot\\assets\\images\\products\\6.jpg",
+      "PackagePath": "staticwebassets\\assets\\images\\products\\6.jpg"
+    },
+    {
+      "Id": "D:\\DATN\\HaNoiTravel\\HaNoiTravel\\wwwroot\\assets\\images\\products\\7.jpg",
+      "PackagePath": "staticwebassets\\assets\\images\\products\\7.jpg"
+    },
+    {
+      "Id": "D:\\DATN\\HaNoiTravel\\HaNoiTravel\\wwwroot\\assets\\images\\products\\8.jpg",
+      "PackagePath": "staticwebassets\\assets\\images\\products\\8.jpg"
+    },
+    {
+      "Id": "D:\\DATN\\HaNoiTravel\\HaNoiTravel\\wwwroot\\assets\\images\\products\\9.jpg",
+      "PackagePath": "staticwebassets\\assets\\images\\products\\9.jpg"
+    },
+    {
+      "Id": "D:\\DATN\\HaNoiTravel\\HaNoiTravel\\wwwroot\\assets\\images\\products\\932409bc-fc7c-4ac1-ac43-adc6942bfc6f.jpg",
+      "PackagePath": "staticwebassets\\assets\\images\\products\\932409bc-fc7c-4ac1-ac43-adc6942bfc6f.jpg"
+    },
+    {
+      "Id": "D:\\DATN\\HaNoiTravel\\HaNoiTravel\\wwwroot\\assets\\images\\products\\ensure.jpg",
+      "PackagePath": "staticwebassets\\assets\\images\\products\\ensure.jpg"
     },
     {
       "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.HaNoiTravel.Microsoft.AspNetCore.StaticWebAssets.props",

@@ -172,3 +172,8 @@ D:\DATN\HaNoiTravel\HaNoiTravel\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.
 D:\DATN\HaNoiTravel\HaNoiTravel\obj\Debug\net8.0\HaNoiTravel.sourcelink.json
 D:\DATN\HaNoiTravel\HaNoiTravel\bin\Debug\net8.0\BCrypt.Net-Core.dll
 D:\DATN\HaNoiTravel\HaNoiTravel\bin\Debug\net8.0\HaNoiTravel.staticwebassets.runtime.json
+D:\DATN\HaNoiTravel\HaNoiTravel\bin\Debug\net8.0\BouncyCastle.Cryptography.dll
+D:\DATN\HaNoiTravel\HaNoiTravel\bin\Debug\net8.0\MailKit.dll
+D:\DATN\HaNoiTravel\HaNoiTravel\bin\Debug\net8.0\MimeKit.dll
+D:\DATN\HaNoiTravel\HaNoiTravel\bin\Debug\net8.0\System.Security.Cryptography.Pkcs.dll
+D:\DATN\HaNoiTravel\HaNoiTravel\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Security.Cryptography.Pkcs.dll

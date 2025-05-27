@@ -17,5 +17,8 @@ namespace HaNoiTravel.Interfaces
         // *** Thêm phương thức thu hồi Refresh Token (cho Logout) ***
         // Trả về true nếu thu hồi thành công, false nếu không tìm thấy hoặc đã thu hồi
         Task<bool> RevokeRefreshTokenAsync(string refreshToken, string ipAddress, string reason = null);
+        Task<bool> RequestPasswordReset(string emailOrPhone);
+        Task<(bool success, string message, string? tempResetToken)> VerifyPasswordResetOtp(string emailOrPhone, string otp); // Cập nhật return type
+        Task<bool> ResetPassword(string emailOrPhone, string tempResetToken, string newPassword); // Cập nhật tham số
     }
 }

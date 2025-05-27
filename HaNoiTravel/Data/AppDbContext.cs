@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using HaNoiTravel.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace HaNoiTravel.Data;
 
@@ -69,7 +68,7 @@ public partial class AppDbContext : DbContext
     {
         modelBuilder.Entity<Address>(entity =>
         {
-            entity.HasKey(e => e.Addressid).HasName("PK__ADDRESSE__DE5657C1E2A16250");
+            entity.HasKey(e => e.Addressid).HasName("PK__ADDRESSE__DE5657C1D001E0A2");
 
             entity.ToTable("ADDRESSES");
 
@@ -98,12 +97,13 @@ public partial class AppDbContext : DbContext
 
             entity.HasOne(d => d.Customer).WithMany(p => p.Addresses)
                 .HasForeignKey(d => d.Customerid)
-                .HasConstraintName("FK_Addresses_Customers");
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__ADDRESSES__CUSTO__08B54D69");
         });
 
         modelBuilder.Entity<Booking>(entity =>
         {
-            entity.HasKey(e => e.Bookingid).HasName("PK__BOOKINGS__651D52BD986AF026");
+            entity.HasKey(e => e.Bookingid).HasName("PK__BOOKINGS__651D52BD9E421D3D");
 
             entity.ToTable("BOOKINGS");
 
@@ -142,45 +142,44 @@ public partial class AppDbContext : DbContext
             entity.HasOne(d => d.Address).WithMany(p => p.Bookings)
                 .HasForeignKey(d => d.Addressid)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__BOOKINGS__ADDRES__1AD3FDA4");
+                .HasConstraintName("FK__BOOKINGS__ADDRES__0D7A0286");
 
             entity.HasOne(d => d.Customer).WithMany(p => p.Bookings)
                 .HasForeignKey(d => d.Customerid)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__BOOKINGS__CUSTOM__18EBB532");
+                .HasConstraintName("FK__BOOKINGS__CUSTOM__0B91BA14");
 
             entity.HasOne(d => d.PaymentStatus).WithMany(p => p.Bookings)
                 .HasForeignKey(d => d.PaymentStatusId)
-                .HasConstraintName("FK__BOOKINGS__Paymen__0697FACD");
+                .HasConstraintName("FK__BOOKINGS__Paymen__19DFD96B");
 
             entity.HasOne(d => d.Service).WithMany(p => p.Bookings)
                 .HasForeignKey(d => d.Serviceid)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__BOOKINGS__SERVIC__1CBC4616");
+                .HasConstraintName("FK__BOOKINGS__SERVIC__0F624AF8");
 
             entity.HasOne(d => d.Staff).WithMany(p => p.Bookings)
                 .HasForeignKey(d => d.Staffid)
-                .HasConstraintName("FK__BOOKINGS__STAFFI__1DB06A4F");
+                .HasConstraintName("FK__BOOKINGS__STAFFI__10566F31");
 
             entity.HasOne(d => d.Status).WithMany(p => p.Bookings)
                 .HasForeignKey(d => d.Statusid)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__BOOKINGS__STATUS__245D67DE");
+                .HasConstraintName("FK__BOOKINGS__STATUS__160F4887");
 
             entity.HasOne(d => d.Subject).WithMany(p => p.Bookings)
                 .HasForeignKey(d => d.Subjectid)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__BOOKINGS__SUBJEC__1EA48E88");
-            entity.ToTable("BOOKINGS", table => table.UseSqlOutputClause(false));
+                .HasConstraintName("FK__BOOKINGS__SUBJEC__114A936A");
         });
 
         modelBuilder.Entity<Bookingstatus>(entity =>
         {
-            entity.HasKey(e => e.Statusid).HasName("PK__BOOKINGS__D135272EE6990F19");
+            entity.HasKey(e => e.Statusid).HasName("PK__BOOKINGS__D135272E48C86D8E");
 
             entity.ToTable("BOOKINGSTATUS");
 
-            entity.HasIndex(e => e.Statusname, "UQ__BOOKINGS__3144C0271E3B25D7").IsUnique();
+            entity.HasIndex(e => e.Statusname, "UQ__BOOKINGS__3144C02754D7AD64").IsUnique();
 
             entity.Property(e => e.Statusid).HasColumnName("STATUSID");
             entity.Property(e => e.Statusname)
@@ -190,7 +189,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<Category>(entity =>
         {
-            entity.HasKey(e => e.Categoryid).HasName("PK__CATEGORI__A50F989605C8918A");
+            entity.HasKey(e => e.Categoryid).HasName("PK__CATEGORI__A50F9896DC7FA811");
 
             entity.ToTable("CATEGORIES");
 
@@ -208,7 +207,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<Customer>(entity =>
         {
-            entity.HasKey(e => e.Customerid).HasName("PK__CUSTOMER__61DBD7889315C536");
+            entity.HasKey(e => e.Customerid).HasName("PK__CUSTOMER__61DBD7888202D21C");
 
             entity.ToTable("CUSTOMERS");
 
@@ -235,12 +234,12 @@ public partial class AppDbContext : DbContext
             entity.HasOne(d => d.User).WithOne(p => p.Customer)
                 .HasForeignKey<Customer>(d => d.Userid)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__CUSTOMERS__USERI__151B244E");
+                .HasConstraintName("FK__CUSTOMERS__USERI__07C12930");
         });
 
         modelBuilder.Entity<Order>(entity =>
         {
-            entity.HasKey(e => e.Orderid).HasName("PK__ORDERS__491E41921DF62C66");
+            entity.HasKey(e => e.Orderid).HasName("PK__ORDERS__491E4192A9AF9435");
 
             entity.ToTable("ORDERS");
 
@@ -266,22 +265,22 @@ public partial class AppDbContext : DbContext
             entity.HasOne(d => d.Address).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.Addressid)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__ORDERS__ADDRESSI__19DFD96B");
+                .HasConstraintName("FK__ORDERS__ADDRESSI__0C85DE4D");
 
             entity.HasOne(d => d.Customer).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.Customerid)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__ORDERS__CUSTOMER__17F790F9");
+                .HasConstraintName("FK__ORDERS__CUSTOMER__0A9D95DB");
 
             entity.HasOne(d => d.Orderstatus).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.Orderstatusid)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__ORDERS__ORDERSTA__2645B050");
+                .HasConstraintName("FK__ORDERS__ORDERSTA__17F790F9");
         });
 
         modelBuilder.Entity<Orderdetail>(entity =>
         {
-            entity.HasKey(e => e.Orderdetailid).HasName("PK__ORDERDET__5999A0EDFCA7B58B");
+            entity.HasKey(e => e.Orderdetailid).HasName("PK__ORDERDET__5999A0EDDCD0877C");
 
             entity.ToTable("ORDERDETAILS");
 
@@ -300,21 +299,21 @@ public partial class AppDbContext : DbContext
             entity.HasOne(d => d.Order).WithMany(p => p.Orderdetails)
                 .HasForeignKey(d => d.Orderid)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__ORDERDETA__ORDER__25518C17");
+                .HasConstraintName("FK__ORDERDETA__ORDER__17036CC0");
 
             entity.HasOne(d => d.Product).WithMany(p => p.Orderdetails)
                 .HasForeignKey(d => d.Productid)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__ORDERDETA__PRODU__236943A5");
+                .HasConstraintName("FK__ORDERDETA__PRODU__151B244E");
         });
 
         modelBuilder.Entity<Orderstatus>(entity =>
         {
-            entity.HasKey(e => e.Orderstatusid).HasName("PK__ORDERSTA__D8683934A09FF58D");
+            entity.HasKey(e => e.Orderstatusid).HasName("PK__ORDERSTA__D86839341C785DE4");
 
             entity.ToTable("ORDERSTATUS");
 
-            entity.HasIndex(e => e.Statusname, "UQ__ORDERSTA__3144C0279CC6210D").IsUnique();
+            entity.HasIndex(e => e.Statusname, "UQ__ORDERSTA__3144C02729FA881C").IsUnique();
 
             entity.Property(e => e.Orderstatusid).HasColumnName("ORDERSTATUSID");
             entity.Property(e => e.Statusname)
@@ -324,7 +323,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<Payment>(entity =>
         {
-            entity.HasKey(e => e.Paymentid).HasName("PK__PAYMENTS__F9599AC8009652D0");
+            entity.HasKey(e => e.Paymentid).HasName("PK__PAYMENTS__F9599AC872DE4AA7");
 
             entity.ToTable("PAYMENTS");
 
@@ -352,16 +351,16 @@ public partial class AppDbContext : DbContext
             entity.HasOne(d => d.Transaction).WithMany(p => p.Payments)
                 .HasForeignKey(d => d.Transactionid)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__PAYMENTS__TRANSA__1332DBDC");
+                .HasConstraintName("FK__PAYMENTS__TRANSA__05D8E0BE");
         });
 
         modelBuilder.Entity<Paymentmethod>(entity =>
         {
-            entity.HasKey(e => e.Paymentmethodid).HasName("PK__PAYMENTM__889FEE163CD76AD6");
+            entity.HasKey(e => e.Paymentmethodid).HasName("PK__PAYMENTM__889FEE168B2EABA5");
 
             entity.ToTable("PAYMENTMETHOD");
 
-            entity.HasIndex(e => e.Methodname, "UQ__PAYMENTM__59AC00D8250B63EF").IsUnique();
+            entity.HasIndex(e => e.Methodname, "UQ__PAYMENTM__59AC00D8803DC5D5").IsUnique();
 
             entity.Property(e => e.Paymentmethodid).HasColumnName("PAYMENTMETHODID");
             entity.Property(e => e.Methodname)
@@ -371,11 +370,11 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<Paymentstatus>(entity =>
         {
-            entity.HasKey(e => e.Paymentstatusid).HasName("PK__PAYMENTS__6F8CB0ACA37C60D9");
+            entity.HasKey(e => e.Paymentstatusid).HasName("PK__PAYMENTS__6F8CB0ACE499D87B");
 
             entity.ToTable("PAYMENTSTATUS");
 
-            entity.HasIndex(e => e.Statusname, "UQ__PAYMENTS__3144C0279E2838EF").IsUnique();
+            entity.HasIndex(e => e.Statusname, "UQ__PAYMENTS__3144C0271093AD95").IsUnique();
 
             entity.Property(e => e.Paymentstatusid).HasColumnName("PAYMENTSTATUSID");
             entity.Property(e => e.Statusname)
@@ -385,11 +384,11 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<Product>(entity =>
         {
-            entity.HasKey(e => e.Productid).HasName("PK__PRODUCTS__34980AA25D421504");
+            entity.HasKey(e => e.Productid).HasName("PK__PRODUCTS__34980AA2AC5EF056");
 
             entity.ToTable("PRODUCTS");
 
-            entity.HasIndex(e => e.Sku, "UQ__PRODUCTS__CA1ECF0D73A3D158").IsUnique();
+            entity.HasIndex(e => e.Sku, "UQ__PRODUCTS__CA1ECF0D1DFF46DF").IsUnique();
 
             entity.Property(e => e.Productid).HasColumnName("PRODUCTID");
             entity.Property(e => e.Categoryid).HasColumnName("CATEGORYID");
@@ -423,7 +422,7 @@ public partial class AppDbContext : DbContext
             entity.HasOne(d => d.Category).WithMany(p => p.Products)
                 .HasForeignKey(d => d.Categoryid)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__PRODUCTS__CATEGO__208CD6FA");
+                .HasConstraintName("FK__PRODUCTS__CATEGO__1332DBDC");
         });
 
         modelBuilder.Entity<RefreshToken>(entity =>
@@ -452,11 +451,11 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<Role>(entity =>
         {
-            entity.HasKey(e => e.Roleid).HasName("PK__ROLES__006568E9EDFFB27D");
+            entity.HasKey(e => e.Roleid).HasName("PK__ROLES__006568E9D1C90750");
 
             entity.ToTable("ROLES");
 
-            entity.HasIndex(e => e.Rolename, "UQ__ROLES__7E6818972383BBD2").IsUnique();
+            entity.HasIndex(e => e.Rolename, "UQ__ROLES__7E681897FECC9A0A").IsUnique();
 
             entity.Property(e => e.Roleid)
                 .ValueGeneratedNever()
@@ -468,7 +467,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<Service>(entity =>
         {
-            entity.HasKey(e => e.Serviceid).HasName("PK__SERVICES__CE63E076372FD08C");
+            entity.HasKey(e => e.Serviceid).HasName("PK__SERVICES__CE63E07650BCD9D8");
 
             entity.ToTable("SERVICES");
 
@@ -495,17 +494,17 @@ public partial class AppDbContext : DbContext
             entity.HasOne(d => d.Servicegroup).WithMany(p => p.Services)
                 .HasForeignKey(d => d.Servicegroupid)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__SERVICES__SERVIC__1BC821DD");
+                .HasConstraintName("FK__SERVICES__SERVIC__0E6E26BF");
 
             entity.HasOne(d => d.Subjecttype).WithMany(p => p.Services)
                 .HasForeignKey(d => d.Subjecttypeid)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__SERVICES__SUBJEC__3D2915A8");
+                .HasConstraintName("FK__SERVICES__SUBJEC__04E4BC85");
         });
 
         modelBuilder.Entity<Servicegroup>(entity =>
         {
-            entity.HasKey(e => e.Servicegroupid).HasName("PK__SERVICEG__EDE1FE4778F5A7CC");
+            entity.HasKey(e => e.Servicegroupid).HasName("PK__SERVICEG__EDE1FE4707F3E1DE");
 
             entity.ToTable("SERVICEGROUPS");
 
@@ -517,13 +516,13 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<Staff>(entity =>
         {
-            entity.HasKey(e => e.Staffid).HasName("PK__STAFF__28B5063B047D68C8");
+            entity.HasKey(e => e.Staffid).HasName("PK__STAFF__28B5063B61CB735B");
 
             entity.ToTable("STAFF");
 
             entity.HasIndex(e => e.Userid, "UQ_STAFF_USERID").IsUnique();
 
-            entity.HasIndex(e => e.Phonenumber, "UQ__STAFF__8F2B07B14093EEDA").IsUnique();
+            entity.HasIndex(e => e.Phonenumber, "UQ__STAFF__8F2B07B143B72811").IsUnique();
 
             entity.Property(e => e.Staffid).HasColumnName("STAFFID");
             entity.Property(e => e.Createat)
@@ -553,12 +552,12 @@ public partial class AppDbContext : DbContext
             entity.HasOne(d => d.User).WithOne(p => p.Staff)
                 .HasForeignKey<Staff>(d => d.Userid)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__STAFF__USERID__14270015");
+                .HasConstraintName("FK__STAFF__USERID__06CD04F7");
         });
 
         modelBuilder.Entity<Subject>(entity =>
         {
-            entity.HasKey(e => e.Subjectid).HasName("PK__SUBJECTS__C97AA6F5C5B18769");
+            entity.HasKey(e => e.Subjectid).HasName("PK__SUBJECTS__C97AA6F59E014D86");
 
             entity.ToTable("SUBJECTS");
 
@@ -586,21 +585,21 @@ public partial class AppDbContext : DbContext
             entity.HasOne(d => d.Customer).WithMany(p => p.Subjects)
                 .HasForeignKey(d => d.Customerid)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__SUBJECTS__CUSTOM__17036CC0");
+                .HasConstraintName("FK__SUBJECTS__CUSTOM__09A971A2");
 
             entity.HasOne(d => d.Type).WithMany(p => p.Subjects)
                 .HasForeignKey(d => d.Typeid)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__SUBJECTS__TYPEID__2739D489");
+                .HasConstraintName("FK__SUBJECTS__TYPEID__18EBB532");
         });
 
         modelBuilder.Entity<Subjecttype>(entity =>
         {
-            entity.HasKey(e => e.Typeid).HasName("PK__SUBJECTT__B2802A01AC61E36A");
+            entity.HasKey(e => e.Typeid).HasName("PK__SUBJECTT__B2802A013D1EEBA6");
 
             entity.ToTable("SUBJECTTYPES");
 
-            entity.HasIndex(e => e.Subjectname, "UQ__SUBJECTT__4CE96D2E0594F016").IsUnique();
+            entity.HasIndex(e => e.Subjectname, "UQ__SUBJECTT__4CE96D2E38C74740").IsUnique();
 
             entity.Property(e => e.Typeid).HasColumnName("TYPEID");
             entity.Property(e => e.Subjectname)
@@ -610,7 +609,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<Transaction>(entity =>
         {
-            entity.HasKey(e => e.TransactionId).HasName("PK__TRANSACT__55433A4B26DE396F");
+            entity.HasKey(e => e.TransactionId).HasName("PK__TRANSACT__55433A4B8A675340");
 
             entity.ToTable("TRANSACTIONS");
 
@@ -637,22 +636,22 @@ public partial class AppDbContext : DbContext
             entity.HasOne(d => d.Customer).WithMany(p => p.Transactions)
                 .HasForeignKey(d => d.CustomerId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__TRANSACTI__Custo__0A9D95DB");
+                .HasConstraintName("FK__TRANSACTI__Custo__787EE5A0");
 
             entity.HasOne(d => d.PaymentMethod).WithMany(p => p.Transactions)
                 .HasForeignKey(d => d.PaymentMethodId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__TRANSACTI__Payme__0B91BA14");
+                .HasConstraintName("FK__TRANSACTI__Payme__797309D9");
 
             entity.HasOne(d => d.PaymentStatus).WithMany(p => p.Transactions)
                 .HasForeignKey(d => d.PaymentStatusId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__TRANSACTI__Payme__0C85DE4D");
+                .HasConstraintName("FK__TRANSACTI__Payme__7A672E12");
         });
 
         modelBuilder.Entity<TransactionItem>(entity =>
         {
-            entity.HasKey(e => e.TransactionItemId).HasName("PK__TRANSACT__0D2BBCBAAC878250");
+            entity.HasKey(e => e.TransactionItemId).HasName("PK__TRANSACT__0D2BBCBAFF449321");
 
             entity.ToTable("TRANSACTION_ITEMS");
 
@@ -664,29 +663,29 @@ public partial class AppDbContext : DbContext
 
             entity.HasOne(d => d.Booking).WithMany(p => p.TransactionItems)
                 .HasForeignKey(d => d.BookingId)
-                .HasConstraintName("FK__TRANSACTI__Booki__114A936A");
+                .HasConstraintName("FK__TRANSACTI__Booki__7F2BE32F");
 
             entity.HasOne(d => d.Order).WithMany(p => p.TransactionItems)
                 .HasForeignKey(d => d.OrderId)
-                .HasConstraintName("FK__TRANSACTI__Order__10566F31");
+                .HasConstraintName("FK__TRANSACTI__Order__7E37BEF6");
 
             entity.HasOne(d => d.Transaction).WithMany(p => p.TransactionItems)
                 .HasForeignKey(d => d.TransactionId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__TRANSACTI__Trans__0F624AF8");
+                .HasConstraintName("FK__TRANSACTI__Trans__7D439ABD");
         });
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.Userid).HasName("PK__USER__7B9E7F3517A092A8");
+            entity.HasKey(e => e.Userid).HasName("PK__USER__7B9E7F351B0FCCFE");
 
             entity.ToTable("USER");
 
-            entity.HasIndex(e => e.Email, "UQ__USER__161CF72466A4FA0C").IsUnique();
+            entity.HasIndex(e => e.Email, "UQ__USER__161CF72428D80DDE").IsUnique();
 
-            entity.HasIndex(e => e.Phonenumber, "UQ__USER__8F2B07B13C7C564C").IsUnique();
+            entity.HasIndex(e => e.Phonenumber, "UQ__USER__8F2B07B1A68B3025").IsUnique();
 
-            entity.HasIndex(e => e.Username, "UQ__USER__B15BE12E5079C2EC").IsUnique();
+            entity.HasIndex(e => e.Username, "UQ__USER__B15BE12E4A384D04").IsUnique();
 
             entity.Property(e => e.Userid).HasColumnName("USERID");
             entity.Property(e => e.Createdat)
@@ -698,6 +697,10 @@ public partial class AppDbContext : DbContext
                 .IsUnicode(false)
                 .HasColumnName("EMAIL");
             entity.Property(e => e.Isactive).HasColumnName("ISACTIVE");
+            entity.Property(e => e.PasswordResetToken)
+                .HasMaxLength(256)
+                .IsUnicode(false);
+            entity.Property(e => e.PasswordResetTokenExpiry).HasPrecision(3);
             entity.Property(e => e.Passwordhash)
                 .HasMaxLength(255)
                 .IsUnicode(false)
@@ -718,9 +721,8 @@ public partial class AppDbContext : DbContext
             entity.HasOne(d => d.Role).WithMany(p => p.Users)
                 .HasForeignKey(d => d.Roleid)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__USER__ROLEID__1F98B2C1");
+                .HasConstraintName("FK__USER__ROLEID__123EB7A3");
         });
-
 
         OnModelCreatingPartial(modelBuilder);
     }

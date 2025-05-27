@@ -10,12 +10,14 @@ namespace HaNoiTravel.Services
     {
         private readonly AppDbContext _context;
         private readonly IWebHostEnvironment _hostingEnvironment;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         // Inject DbContext qua constructor
-        public ProductService(AppDbContext context, IWebHostEnvironment hostingEnvironment)
+        public ProductService(AppDbContext context, IWebHostEnvironment hostingEnvironment, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
             _hostingEnvironment = hostingEnvironment;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<IEnumerable<Products>> GetActiveProductsAsync()
@@ -40,19 +42,40 @@ namespace HaNoiTravel.Services
             var categoryExists = await _context.Categories.AnyAsync(c => c.Categoryid == categoryId);
             if (!categoryExists)
             {
-                return (null, $"Category with ID {categoryId} not found."); // Trả về lỗi
+                return (null, $"Category with ID {categoryId} not found.");
             }
 
-            var products = await _context.Products
+            // Bước 1: Lấy các thực thể Product từ database vào bộ nhớ trước
+            var entities = await _context.Products
                                          .Where(p => p.Categoryid == categoryId && p.Isactive)
-                                         .Select(p => MapToDto(p))
                                          .ToListAsync();
-            return (products, null); // Trả về danh sách và không có lỗi
+
+            // Bước 2: Sau đó, ánh xạ các thực thể trong bộ nhớ sang DTO và xây dựng URL đầy đủ
+            var products = entities.Select(p => MapToDto(p)).ToList();
+            return (products, null);
         }
 
         // Hàm helper MapToDto (có thể để private hoặc tạo một lớp Mapper riêng)
-        private static Products MapToDto(Product product)
+        private Products MapToDto(Product product) // Bỏ từ khóa 'static'
         {
+            string? fullImageUrl = null;
+            if (!string.IsNullOrEmpty(product.Imageurl))
+            {
+                var request = _httpContextAccessor.HttpContext?.Request;
+                if (request != null)
+                {
+                    // Xây dựng URL gốc của backend (ví dụ: https://localhost:5000)
+                    var baseUrl = $"{request.Scheme}://{request.Host}";
+                    // Ghép URL gốc với đường dẫn tương đối từ DB
+                    fullImageUrl = $"{baseUrl}{product.Imageurl}";
+                }
+                else
+                {
+                    // Trường hợp HttpContext không có (ví dụ: chạy background service), giữ nguyên đường dẫn tương đối
+                    fullImageUrl = product.Imageurl;
+                }
+            }
+
             return new Products
             {
                 ProductId = product.Productid,
@@ -61,7 +84,7 @@ namespace HaNoiTravel.Services
                 Description = product.Description,
                 Price = product.Price,
                 StockQuantity = product.Stockquantity,
-                ImageUrl = product.Imageurl,
+                ImageUrl = fullImageUrl, // Sử dụng URL đầy đủ
                 Sku = product.Sku,
                 IsActive = product.Isactive,
                 CreatedAt = product.Createdat ?? DateTime.Now,
@@ -70,33 +93,26 @@ namespace HaNoiTravel.Services
         }
         public async Task<Pagination<Products>> GetPagedActiveProductsAsync(int pageIndex, int pageSize, int? categoryId)
         {
-            // Bắt đầu query IQueryable từ Entity
             var query = _context.Products.AsQueryable();
-
-            // Áp dụng lọc theo trạng thái Active
             query = query.Where(p => p.Isactive);
 
-            // Áp dụng lọc theo danh mục nếu categoryId có giá trị
             if (categoryId.HasValue)
             {
                 query = query.Where(p => p.Categoryid == categoryId.Value);
             }
 
-            // Đếm tổng số mục khớp với điều kiện lọc (quan trọng!)
             var totalCount = await query.CountAsync();
+            query = query.OrderBy(p => p.Productid);
 
-            // Áp dụng Sắp xếp (OrderBy) - BẮT BUỘC cho phân trang đúng
-            // Nên sắp xếp theo khóa chính hoặc một cột có tính duy nhất/thứ tự xác định
-            query = query.OrderBy(p => p.Productid); // Sắp xếp theo ProductId
-
-            // Áp dụng Phân trang (Skip và Take)
-            var items = await query
-                .Skip(pageIndex * pageSize) // Bỏ qua số lượng mục của các trang trước
-                .Take(pageSize)           // Lấy số lượng mục của trang hiện tại
-                .Select(p => MapToDto(p)) // Chuyển Entity sang DTO
+            // Bước 1: Lấy các thực thể Product đã được phân trang từ database vào bộ nhớ trước
+            var entities = await query
+                .Skip(pageIndex * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
 
-            // Trả về kết quả trong DTO PagedResult
+            // Bước 2: Sau đó, ánh xạ các thực thể trong bộ nhớ sang DTO và xây dựng URL đầy đủ
+            var items = entities.Select(p => MapToDto(p)).ToList();
+
             return new Pagination<Products>
             {
                 Items = items,

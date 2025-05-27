@@ -23,6 +23,10 @@ public partial class User
 
     public int Roleid { get; set; }
 
+    public string? PasswordResetToken { get; set; }
+
+    public DateTime? PasswordResetTokenExpiry { get; set; }
+
     public virtual Customer? Customer { get; set; }
 
     public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();

@@ -261,5 +261,58 @@ namespace HaNoiTravel.Controllers
                 return StatusCode(500, "Internal Server Error");
             }
         }
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { message = "Dữ liệu yêu cầu không hợp lệ.", errors = ModelState });
+            }
+
+            // Gửi OTP. Luôn trả về 200 OK để tránh lộ thông tin user.
+            await _loginService.RequestPasswordReset(request.EmailOrPhone);
+            return Ok(new { message = "Nếu email hoặc số điện thoại tồn tại trong hệ thống, một mã xác nhận đã được gửi đến bạn." });
+        }
+
+        [HttpPost("verify-otp")]
+        public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { message = "Dữ liệu yêu cầu không hợp lệ.", errors = ModelState });
+            }
+
+            var (success, message, tempResetToken) = await _loginService.VerifyPasswordResetOtp(request.EmailOrPhone, request.Otp);
+
+            if (success)
+            {
+                return Ok(new { message = message, tempResetToken = tempResetToken }); // Trả về tempResetToken
+            }
+            else
+            {
+                return BadRequest(new { message = message });
+            }
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { message = "Dữ liệu yêu cầu không hợp lệ.", errors = ModelState });
+            }
+
+            // Gọi ResetPassword với tempResetToken
+            var result = await _loginService.ResetPassword(request.EmailOrPhone, request.TempResetToken, request.NewPassword);
+
+            if (result)
+            {
+                return Ok(new { message = "Mật khẩu của bạn đã được đặt lại thành công." });
+            }
+            else
+            {
+                return BadRequest(new { message = "Liên kết đặt lại mật khẩu không hợp lệ hoặc đã hết hạn. Vui lòng yêu cầu lại." });
+            }
+        }
     }
 }

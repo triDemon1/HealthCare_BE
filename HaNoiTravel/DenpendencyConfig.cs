@@ -22,6 +22,7 @@ namespace HaNoiTravel
             services.AddScoped<ICustomerService, CustomerService>();
             services.AddScoped<IPaymentService, PaymentService>();
             services.AddScoped<IMomoService, MomoService>();
+            services.AddScoped<IEmailService, EmailService>();
             return services;
         }
     }

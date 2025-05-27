@@ -17,12 +17,14 @@ namespace HaNoiTravel.Services
     {
         private readonly AppDbContext _context; // Để thao tác với database
         private readonly IConfiguration _configuration; // Để đọc JWT Key từ cấu hình
+        private readonly IEmailService _emailService;
 
         // Inject AppDbContext và IConfiguration thông qua constructor
-        public LoginService(AppDbContext context, IConfiguration configuration)
+        public LoginService(AppDbContext context, IConfiguration configuration, IEmailService emailService)
         {
             _context = context;
             _configuration = configuration;
+            _emailService = emailService;
         }
 
         // *** Phương thức sinh Refresh Token ***
@@ -57,7 +59,7 @@ namespace HaNoiTravel.Services
                                     .Include(u => u.Customer)
                                     .ThenInclude(c => c.Addresses)
                                     .FirstOrDefaultAsync(u => u.Username == loginRequest.Username); // Hoặc u.EMAIL == loginRequest.Email
-            var addressId = user.Customer?.Addresses?.FirstOrDefault()?.Addressid;
+           var addressId = user.Customer?.Addresses?.FirstOrDefault()?.Addressid;
             if (user == null)
             {
                 return null; // User not found
@@ -213,6 +215,119 @@ namespace HaNoiTravel.Services
                 rngCryptoServiceProvider.GetBytes(randomBytes);
                 return Convert.ToBase64String(randomBytes);
             }
+        }
+        public async Task<bool> RequestPasswordReset(string emailOrPhone)
+        {
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Email == emailOrPhone || u.Phonenumber == emailOrPhone);
+
+            if (user == null)
+            {
+                // Luôn trả về true để tránh lộ thông tin user tồn tại hay không vì lý do bảo mật.
+                return true;
+            }
+
+            // Tạo mã OTP 6 chữ số
+            var otp = GenerateOtp(); // Phương thức mới để tạo OTP
+            var expiryTime = DateTime.Now.AddMinutes(1); // OTP hết hạn sau 5 phút (có thể cấu hình)
+
+            // Lưu OTP và thời gian hết hạn vào user
+            user.PasswordResetToken = otp;
+            user.PasswordResetTokenExpiry = expiryTime;
+            user.Updatedat = DateTime.Now; // Cập nhật thời gian update
+            await _context.SaveChangesAsync();
+
+            var subject = "Mã xác nhận đặt lại mật khẩu của bạn";
+            var message = $"Chào bạn {user.Username},<br/><br/>" +
+                          $"Mã xác nhận đặt lại mật khẩu của bạn là: <strong>{otp}</strong><br/><br/>" +
+                          $"Mã này sẽ hết hạn trong 5 phút. Vui lòng không chia sẻ mã này với bất kỳ ai.<br/><br/>" +
+                          $"Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này.<br/><br/>" +
+                          $"Trân trọng,<br/>" +
+                          $"Đội ngũ hỗ trợ của bạn";
+
+            await _emailService.SendEmailAsync(user.Email, subject, message);
+
+            return true;
+        }
+
+        // Phương thức mới để xác nhận OTP
+        public async Task<(bool success, string message, string? tempResetToken)> VerifyPasswordResetOtp(string emailOrPhone, string otp)
+        {
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => (u.Email == emailOrPhone || u.Phonenumber == emailOrPhone) && u.PasswordResetToken == otp);
+
+            if (user == null)
+            {
+                return (false, "Mã OTP hoặc email/số điện thoại không hợp lệ.", null);
+            }
+
+            if (user.PasswordResetTokenExpiry <= DateTime.UtcNow)
+            {
+                // Xóa OTP đã hết hạn
+                user.PasswordResetToken = null;
+                user.PasswordResetTokenExpiry = null;
+                await _context.SaveChangesAsync();
+                return (false, "Mã OTP đã hết hạn. Vui lòng yêu cầu mã mới.", null);
+            }
+
+            // OTP hợp lệ. Tạo một token tạm thời để dùng cho bước đặt lại mật khẩu.
+            // Token này sẽ thay thế OTP trong PasswordResetToken.
+            var tempResetToken = GenerateResetToken(); // Sử dụng GUID hoặc chuỗi ngẫu nhiên dài hơn
+            user.PasswordResetToken = tempResetToken; // Lưu token tạm thời
+            user.PasswordResetTokenExpiry = DateTime.UtcNow.AddMinutes(10); // Thời gian sống mới cho token tạm thời (ví dụ 10 phút)
+            user.Updatedat = DateTime.Now;
+            await _context.SaveChangesAsync();
+
+            return (true, "Mã OTP hợp lệ.", tempResetToken);
+        }
+
+        // Cập nhật phương thức ResetPassword để nhận token tạm thời
+        public async Task<bool> ResetPassword(string emailOrPhone, string tempResetToken, string newPassword)
+        {
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => (u.Email == emailOrPhone || u.Phonenumber == emailOrPhone) && u.PasswordResetToken == tempResetToken); // Kiểm tra bằng tempResetToken
+
+            if (user == null)
+            {
+                // Token không hợp lệ, đã hết hạn, hoặc email/phone không khớp
+                return false;
+            }
+
+            if (user.PasswordResetTokenExpiry <= DateTime.UtcNow)
+            {
+                // Token đã hết hạn
+                user.PasswordResetToken = null;
+                user.PasswordResetTokenExpiry = null;
+                user.Updatedat = DateTime.Now;
+                await _context.SaveChangesAsync();
+                return false;
+            }
+
+            // Hash mật khẩu mới
+            var hashedPassword = BCrypt.Net.BCrypt.HashPassword(newPassword);
+
+            // Cập nhật mật khẩu
+            user.Passwordhash = hashedPassword;
+
+            // Vô hiệu hóa token sau khi sử dụng thành công (quan trọng!)
+            user.PasswordResetToken = null;
+            user.PasswordResetTokenExpiry = null;
+            user.Updatedat = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+        public static string GenerateResetToken()
+        {
+            // Tạo một token dài hơn, khó đoán hơn cho việc reset thực sự
+            return Guid.NewGuid().ToString("N") + Guid.NewGuid().ToString("N"); // Kết hợp 2 GUID để dài hơn
+        }
+        public static string GenerateOtp()
+        {
+            // Tạo mã OTP 6 chữ số
+            Random random = new Random();
+            return random.Next(100000, 999999).ToString();
         }
     }
 }

@@ -311,6 +311,15 @@ FROM sys.foreign_keys
 WHERE parent_object_id = OBJECT_ID('[SERVICES]')
   AND referenced_object_id = OBJECT_ID('[SUBJECTTYPES]');
 
+
+-- Thêm cột PasswordResetToken
+ALTER TABLE [USER]
+ADD PasswordResetToken VARCHAR(256) NULL;
+
+-- Thêm cột PasswordResetTokenExpiry
+ALTER TABLE [USER]
+ADD PasswordResetTokenExpiry DATETIME2(3) NULL;
+
 ALTER TABLE [dbo].[RefreshTokens] WITH CHECK ADD CONSTRAINT [FK_RefreshTokens_User_UserId]
 FOREIGN KEY ([UserId])
 REFERENCES [dbo].[USER] ([USERID])
@@ -375,6 +384,10 @@ ADD CONSTRAINT UQ_CUSTOMERS_USERID  UNIQUE ([USERID]);
 
 ALTER TABLE ADDRESSES
 DROP CONSTRAINT FK__ADDRESSES__CUSTO__160F4887;
+
+
+
+
 
 -- B2: Thêm lại constraint mới với CASCADE
 ALTER TABLE ADDRESSES
@@ -584,7 +597,7 @@ SELECT * FROM [RefreshTokens]
 SELECT * FROM BOOKINGS
 SELECT * FROM STAFF
 SELECT * FROM [USER]
-SELECT * FROM PRODUCTS
+
 SELECT * FROM PAYMENTMETHOD
 	UPDATE [USER]
 	SET ROLEID = '1'
@@ -605,8 +618,10 @@ SELECT * FROM [SERVICES]
 
 
 
-
-
+SELECT * FROM PRODUCTS
+UPDATE PRODUCTS
+SET IMAGEURL = '/assets/images/products/7.jpg'
+WHERE PRODUCTID = '2'
 
 
 
