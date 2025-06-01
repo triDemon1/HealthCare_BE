@@ -5,7 +5,7 @@ namespace HaNoiTravel.Interfaces
     public interface IBookingManagementService
     {
         // Booking Management
-        Task<IEnumerable<BookingAdminDto>> GetAllBookingsAsync();
+        Task<Pagination<BookingAdminDto>> GetAllBookingsAsync(int pageIndex, int pageSize, string searchTerm);
         Task<BookingAdminDto?> GetBookingByIdAsync(int bookingId);
         Task<BookingAdminDto?> UpdateBookingStatusAsync(int bookingId, StatusUpdateDto statusDto); // Ví dụ cập nhật trạng thái
         Task<bool> DeleteBookingAsync(int bookingId);

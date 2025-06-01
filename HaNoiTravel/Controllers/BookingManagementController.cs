@@ -20,10 +20,13 @@ namespace HaNoiTravel.Controllers
             _bookingManagementService = bookingManagementService;
         }
         [HttpGet("admin/bookings")]
-        public async Task<ActionResult<IEnumerable<BookingAdminDto>>> GetAllBookings()
+        public async Task<ActionResult<Pagination<BookingAdminDto>>> GetAllBookings(
+            [FromQuery] int pageIndex = 0,
+            [FromQuery] int pageSize = 10,
+            [FromQuery] string searchTerm = "")
         {
-            var bookings = await _bookingManagementService.GetAllBookingsAsync();
-            return Ok(bookings);
+            var pagedBookings = await _bookingManagementService.GetAllBookingsAsync(pageIndex, pageSize, searchTerm);
+            return Ok(pagedBookings);
         }
 
         [HttpGet("admin/bookings/{bookingId}")]

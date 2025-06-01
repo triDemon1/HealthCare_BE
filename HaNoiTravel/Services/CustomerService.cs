@@ -164,5 +164,62 @@ namespace HaNoiTravel.Services
             // }
             // return null; // Trả về null nếu không có thay đổi hoặc lỗi
         }
+        public async Task<Pagination<PurchaseHistoryDto>> GetPurchaseHistoryAsync(int customerId, int pageIndex, int pageSize)
+        {
+            // Tạo IQueryable cho các mục lịch sử từ Order
+            var orderHistoryQuery = _context.TransactionItems
+                .AsNoTracking() // Quan trọng: chỉ đọc
+                .Where(ti => ti.Transaction.CustomerId == customerId && ti.OrderId != null && ti.Order != null)
+                // Sử dụng SelectMany để "làm phẳng" OrderDetails thành các PurchaseHistoryDto
+                // Mỗi OrderDetail sẽ trở thành một PurchaseHistoryDto riêng biệt
+                .SelectMany(ti => ti.Order.Orderdetails.Select(od => new PurchaseHistoryDto
+                {
+                    ItemType = "Order",
+                    // Ưu tiên TransactionDate từ Transaction, nếu null thì dùng Createdat của Transaction
+                    TransactionDate = ti.Transaction.TransactionDate ?? ti.Transaction.Createdat,
+                    ItemName = od.Product.Name ?? "Không rõ", // Giả sử Product không bao giờ null nếu OrderDetail tồn tại
+                    Amount = od.Priceatpurchase * od.Quantity,
+                    Status = ti.Transaction.PaymentStatus.Statusname ?? "Không rõ"
+                }));
+
+            // Tạo IQueryable cho các mục lịch sử từ Booking
+            var bookingHistoryQuery = _context.TransactionItems
+                .AsNoTracking() // Quan trọng: chỉ đọc
+                .Where(ti => ti.Transaction.CustomerId == customerId && ti.BookingId != null && ti.Booking != null)
+                // Sử dụng Select để chiếu Booking thành PurchaseHistoryDto
+                .Select(ti => new PurchaseHistoryDto
+                {
+                    ItemType = "Booking",
+                    TransactionDate = ti.Transaction.TransactionDate ?? ti.Transaction.Createdat,
+                    ItemName = ti.Booking.Service.Name ?? "Dịch vụ không rõ", // Giả sử Service không bao giờ null
+                    Amount = ti.Booking.Priceatbooking,
+                    Status = ti.Transaction.PaymentStatus.Statusname ?? "Không rõ"
+                });
+
+            // Kết hợp hai IQueryable bằng Concat.
+            // EF Core sẽ cố gắng dịch điều này thành một câu lệnh UNION ALL trong SQL.
+            var combinedQuery = orderHistoryQuery.Concat(bookingHistoryQuery);
+
+            // Đếm tổng số mục trên IQueryable kết hợp (sẽ thực hiện COUNT trên DB)
+            var totalCount = await combinedQuery.CountAsync();
+
+            // Áp dụng sắp xếp và phân trang trên IQueryable kết hợp.
+            // EF Core sẽ cố gắng dịch toàn bộ (UNION ALL, ORDER BY, OFFSET/FETCH) thành một truy vấn SQL.
+            var pagedItems = await combinedQuery
+                                   .OrderByDescending(p => p.TransactionDate)
+                                   .ThenBy(p => p.ItemName) // Sắp xếp phụ cho nhất quán
+                                   .Skip(pageIndex * pageSize)
+                                   .Take(pageSize)
+                                   .ToListAsync();
+
+            return new Pagination<PurchaseHistoryDto>
+            {
+                Items = pagedItems,
+                TotalCount = totalCount,
+                PageIndex = pageIndex,
+                PageSize = pageSize
+            };
+        }
+
     }
 }

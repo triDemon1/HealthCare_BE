@@ -12,17 +12,36 @@ namespace HaNoiTravel.Services
         {
             _context = context;
         }
-        public async Task<IEnumerable<BookingAdminDto>> GetAllBookingsAsync()
+        public async Task<Pagination<BookingAdminDto>> GetAllBookingsAsync(int pageIndex, int pageSize, string searchTerm)
         {
-            var bookings = await _context.Bookings
+            var query = _context.Bookings
                 .Include(b => b.Customer)
                 .Include(b => b.Service)
                 .Include(b => b.Subject)
                 .Include(b => b.Status)
-                .Include(b => b.Staff) // Include Staff
-                .Include(b => b.Address) // Include Address
+                .Include(b => b.Staff)
+                .Include(b => b.Address)
                 .Include(b => b.PaymentStatus)
                 .OrderByDescending(b => b.Scheduledstarttime)
+                .AsQueryable(); // Start with IQueryable to apply filters before pagination
+
+            // Apply search term if provided
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                query = query.Where(b =>
+                    b.Subject.Name.Contains(searchTerm) ||
+                    b.Customer.Firstname.Contains(searchTerm) ||
+                    b.Customer.Lastname.Contains(searchTerm) ||
+                    b.Service.Name.Contains(searchTerm));
+            }
+
+            // Get total count BEFORE pagination
+            var totalCount = await query.CountAsync();
+
+            // Apply pagination
+            var items = await query
+                .Skip(pageIndex * pageSize)
+                .Take(pageSize)
                 .Select(b => new BookingAdminDto
                 {
                     BookingId = b.Bookingid,
@@ -33,15 +52,15 @@ namespace HaNoiTravel.Services
                     StatusId = b.Statusid,
                     StatusName = b.Status.Statusname,
                     ScheduledStartTime = b.Scheduledstarttime,
-                    ScheduledEndTime = b.Scheduledstarttime,
+                    ScheduledEndTime = b.Scheduledendtime, // Fixed: should be ScheduledEndTime
                     paymentStatusName = b.PaymentStatus.Statusname,
                     PriceAtBooking = b.Priceatbooking,
                     Notes = b.Notes,
                     CreatedAt = b.Createdat,
                     CustomerId = b.Customerid,
-                    CustomerName = $"{b.Customer.Firstname} {b.Customer.Lastname}".Trim(), // Combine Customer Name
+                    CustomerName = $"{b.Customer.Firstname} {b.Customer.Lastname}".Trim(),
                     StaffId = b.Staffid,
-                    StaffName = b.Staff != null ? $"{b.Staff.Firstname} {b.Status.Statusname}".Trim() : null, // Combine Staff Name if Staff exists
+                    StaffName = b.Staff != null ? $"{b.Staff.Firstname} {b.Staff.Lastname}".Trim() : null, // Fixed: should be Staff.Lastname
                     AddressId = b.Addressid,
                     AddressStreet = b.Address.Street,
                     AddressWard = b.Address.Ward,
@@ -51,7 +70,13 @@ namespace HaNoiTravel.Services
                 })
                 .ToListAsync();
 
-            return bookings;
+            return new Pagination<BookingAdminDto>
+            {
+                Items = items,
+                TotalCount = totalCount,
+                PageIndex = pageIndex,
+                PageSize = pageSize
+            };
         }
 
         public async Task<BookingAdminDto?> GetBookingByIdAsync(int bookingId)

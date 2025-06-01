@@ -10,5 +10,7 @@ namespace HaNoiTravel.Interfaces
 
         // Phương thức mới để cập nhật thông tin profile người dùng
         Task<bool> UpdateUserProfileAsync(int userId, UpdateUserProfileDto model);
+        Task<Pagination<PurchaseHistoryDto>> GetPurchaseHistoryAsync(int customerId, int pageIndex, int pageSize);
+
     }
 }

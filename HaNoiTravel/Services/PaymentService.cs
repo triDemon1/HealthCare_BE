@@ -359,10 +359,11 @@ namespace HaNoiTravel.Services
                         item.Booking.Updatedat = DateTime.UtcNow;
                         _logger.LogInformation($"Booking {item.Booking.Bookingid} PaymentStatus updated to {newPaymentStatus.Statusname}.");
                         // (Tùy chọn) Cập nhật BookingStatus nếu cần, ví dụ: nếu thanh toán thành công -> Confirmed
-                        // if (newPaymentStatus.Statusname == "Completed") {
-                        //     var confirmedBookingStatus = await _context.Bookingstatuses.FirstOrDefaultAsync(bs => bs.Statusname == "Confirmed");
-                        //     if (confirmedBookingStatus != null) item.Booking.Statusid = confirmedBookingStatus.Statusid;
-                        // }
+                        if (newPaymentStatus.Statusname == "Completed")
+                        {
+                            var confirmedBookingStatus = await _context.Bookingstatuses.FirstOrDefaultAsync(bs => bs.Statusname == "Confirmed");
+                            if (confirmedBookingStatus != null) item.Booking.Statusid = confirmedBookingStatus.Statusid;
+                        }
                     }
                     else if (item.OrderId.HasValue && item.Order != null)
                     {

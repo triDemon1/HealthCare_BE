@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("HaNoiTravel")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e0d03283f623d617cf186348a73ce7118d9e5f0d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+de96e4cb855a9f83570f293884cf29257437c2af")]
 [assembly: System.Reflection.AssemblyProductAttribute("HaNoiTravel")]
 [assembly: System.Reflection.AssemblyTitleAttribute("HaNoiTravel")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

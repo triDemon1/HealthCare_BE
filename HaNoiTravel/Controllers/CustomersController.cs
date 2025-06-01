@@ -83,5 +83,17 @@ namespace HaNoiTravel.Controllers
                 return StatusCode(500, new { message = "Đã xảy ra lỗi nội bộ khi cập nhật profile." });
             }
         }
+        [HttpGet("{customerId}/purchase-history")]
+        public async Task<ActionResult<Pagination<PurchaseHistoryDto>>> GetPurchaseHistory(
+    int customerId, [FromQuery] int pageIndex = 0, [FromQuery] int pageSize = 10)
+        {
+            if (customerId <= 0)
+            {
+                return BadRequest("customerId không hợp lệ.");
+            }
+
+            var result = await _customerService.GetPurchaseHistoryAsync(customerId, pageIndex, pageSize);
+            return Ok(result);
+        }
     }
 }

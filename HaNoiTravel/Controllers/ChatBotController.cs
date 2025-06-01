@@ -32,7 +32,7 @@ namespace HaNoiTravel.Controllers
             };
 
             var req = new HttpRequestMessage(HttpMethod.Post, "https://openrouter.ai/api/v1/chat/completions");
-            req.Headers.Add("Authorization", "Bearer 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"); // thay bằng API key từ OpenRouter
+            req.Headers.Add("Authorization", "Bearer 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"); // thay bằng API key từ OpenRouter
             req.Headers.Add("HTTP-Referer", "http://localhost:7064"); // hoặc tên miền thật nếu đã deploy
 
             req.Content = new StringContent(JsonConvert.SerializeObject(openRouterRequest), Encoding.UTF8, "application/json");
